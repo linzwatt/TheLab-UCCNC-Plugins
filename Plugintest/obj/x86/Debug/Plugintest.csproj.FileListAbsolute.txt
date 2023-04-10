@@ -1,0 +1,16 @@
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\obj\x86\Debug\Plugintest.csprojResolveAssemblyReference.cache
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\Plugintest.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\Plugintest.pdb
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\UCCNC.exe
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\UCCAM.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\OpenTK.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\OpenTK.GLControl.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\Profiler.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\UCCNC.pdb
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\UCCAM.pdb
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\OpenTK.pdb
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\OpenTK.xml
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\OpenTK.GLControl.xml
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\bin\x86\Debug\Profiler.pdb
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\obj\x86\Debug\Plugintest.dll
+C:\!USB_jo\UCCNC_software\UCCNC1718\UCCNC\bin\Release\Plugins\Plugintest\Plugintest\obj\x86\Debug\Plugintest.pdb
