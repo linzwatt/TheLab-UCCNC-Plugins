@@ -50,7 +50,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Plugininterface">
-      <HintPath>..\..\..\..\..\..\UCCNC\Plugininterface.dll</HintPath>
+      <HintPath>Resources\Plugininterface.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System" />

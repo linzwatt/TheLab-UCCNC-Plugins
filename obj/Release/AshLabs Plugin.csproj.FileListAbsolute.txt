@@ -9,5 +9,4 @@ C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Release\AshLabsPlugin.pdb
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\AshLabsPlugin.dll
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\AshLabsPlugin.pdb
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugininterface.dll
-C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\UCCNC.exe
-C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\UCCNC.exe.config
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Release\AshLabs Plugin.csproj.AssemblyReference.cache
