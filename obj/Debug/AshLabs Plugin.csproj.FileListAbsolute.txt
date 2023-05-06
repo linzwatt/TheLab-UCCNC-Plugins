@@ -1,0 +1,6 @@
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\AshLabs Plugin.csproj.AssemblyReference.cache
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\Plugins.ConfigForm.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\Plugins.PluginForm.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\Plugins.Properties.Resources.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\AshLabs Plugin.csproj.GenerateResource.cache
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\obj\Debug\AshLabs Plugin.csproj.CoreCompileInputs.cache
