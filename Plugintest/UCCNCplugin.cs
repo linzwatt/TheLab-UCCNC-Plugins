@@ -9,7 +9,7 @@ namespace Plugins
     {
         bool firstrun = true;  
         public Plugininterface.Entry UC;
-        PluginForm myform;
+        PluginForm pluginForm;
         public bool loopstop = false;
         public bool loopworking = false;
          
@@ -23,7 +23,7 @@ namespace Plugins
         public void Init_event(Plugininterface.Entry UC)
         {
             this.UC = UC;
-            myform = new PluginForm(this);
+            pluginForm = new PluginForm(this);
         }
 
         //Called when the plugin is loaded, the author of the plugin should set the details of the plugin here.
@@ -46,63 +46,46 @@ namespace Plugins
         //Called from UCCNC when the plugin is loaded and started.
         public void Startup_event()
         {
-            if (myform.IsDisposed)
+            if (pluginForm.IsDisposed)
             {
-                myform = new PluginForm(this);
+                pluginForm = new PluginForm(this);
             }
-            myform.Show();
+            pluginForm.Show();
         }
 
         //Called when the Pluginshowup(string Pluginfilename); function is executed in the UCCNC.
         public void Showup_event()
         {
-            if (myform.IsDisposed)
+            if (pluginForm.IsDisposed)
             {
-                myform = new PluginForm(this);
+                pluginForm = new PluginForm(this);
             }
-            myform.Show();
-            myform.BringToFront();
+            pluginForm.Show();
+            pluginForm.BringToFront();
         }
 
         //Called when the UCCNC software is closing.
-        public void Shutdown_event()
-        {
-            try
-            {
-                myform.Close();
-            }
-            catch (Exception) { }
-        }
+        public void Shutdown_event() { try { pluginForm.Close(); } catch (Exception) { } }
 
         //Called in a loop with a 25Hz interval.
         public void Loop_event() 
         {
-            if (loopstop)
-            {
-                return;
-            }
+            if (loopstop) { return; }
 
             loopworking = true;
 
-            if (myform == null || myform.IsDisposed)
-                return;
+            if (pluginForm == null || pluginForm.IsDisposed) { return; }
 
-            if (firstrun)
-            {
-                firstrun = false;
-                //Write code here which has to be run on first cycle only...    
-            }
+            if (firstrun) { firstrun = false; }
 
-            try
-            {
-                myform.label1.Text = "X: " + UC.Getfield(true, 226);
-                myform.label2.Text = "Y: " + UC.Getfield(true, 227);
-                myform.label3.Text = "Z: " + UC.Getfield(true, 228);
-                myform.label4.Text = "A: " + UC.Getfield(true, 229); 
-                myform.label5.Text = "Set feed: " + UC.Getfield(true, 867);
-                myform.label6.Text = "Act feed: " + UC.Getfield(true, 868);
-            }
-            catch (Exception) { }
+            try {
+                pluginForm.label1.Text = "X: " + UC.Getfield(true, 226);
+                pluginForm.label2.Text = "Y: " + UC.Getfield(true, 227);
+                pluginForm.label3.Text = "Z: " + UC.Getfield(true, 228);
+                pluginForm.label4.Text = "A: " + UC.Getfield(true, 229); 
+                pluginForm.label5.Text = "Set feed: " + UC.Getfield(true, 867);
+                pluginForm.label6.Text = "Act feed: " + UC.Getfield(true, 868);
+            } catch (Exception) { }
 
             loopworking = false;
             //Console.WriteLine("" + Convert.ToInt32('A'));
@@ -113,40 +96,35 @@ namespace Plugins
         //The passed parameter is an object and the return value is also an object
         public object Informplugin_event(object Message)
         {
-            if (!(myform == null || myform.IsDisposed))
+            if (!(pluginForm == null || pluginForm.IsDisposed))
             {
                 if (Message is string)
                 {
                     string receivedstr = Message as string;
-                    MessageBox.Show(this.myform, "Informplugin message received by Plugintest! Message was: " + receivedstr);
+                    MessageBox.Show(this.pluginForm, "Informplugin message received by Plugintest! Message was: " + receivedstr);
                 }
             }
 
-            string returnstr = "Return string by Plugintest";
+            string returnstr = "Return string by Plugintest, and the mystery encoded string: '" + Encoding.Unicode.GetString(new byte[8] { 134, 123, 241, 8, 24, 98, 77, 199 }) + "'";
             return (object)returnstr;
         }
 
         //This is a function call made to all plugin dll files
         //The function can be called by macros or by another plugin
         //The passed parameter is an object and there is no return value
-        public void Informplugins_event(object Message)
-        {
-            if (!(myform == null || myform.IsDisposed))
-            {
+        public void Informplugins_event(object Message) {
+            if (!(pluginForm == null || pluginForm.IsDisposed)) {
                 string receivedstr = Message as string;
-                MessageBox.Show(this.myform, "Informplugins message received by Plugintest! Message was: " + receivedstr);
+                MessageBox.Show(this.pluginForm, "Informplugins message received by Plugintest! Message was: " + receivedstr);
             }
         }
 
         //Called when the user presses a button on the UCCNC GUI or if a Callbutton function is executed.
         //The int buttonnumber parameter is the ID of the caller button.
         // The bool onscreen parameter is true if the button was pressed on the GUI and is false if the Callbutton function was called.
-        public void Buttonpress_event(int buttonnumber, bool onscreen)
-        {
-            if (onscreen)
-            {
-                if (buttonnumber == 128)
-                {
+        public void Buttonpress_event(int buttonnumber, bool onscreen) {
+            if (onscreen) {
+                if (buttonnumber == 128) {
                     
                 }
             }

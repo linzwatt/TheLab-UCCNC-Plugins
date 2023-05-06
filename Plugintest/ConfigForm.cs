@@ -14,5 +14,10 @@ namespace Plugins
         {
             InitializeComponent();
         }
+
+        private void ConfigForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

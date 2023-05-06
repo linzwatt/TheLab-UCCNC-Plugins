@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>WHB04BPendant</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net40</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="NYVZ5QbAorSWyluZxn.uNGIFdm1vqy5NYiSby" />
+    <EmbeddedResource Include="NYVZ5QbAorSWyluZxn.uNGIFdm1vqy5NYiSby" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Plugininterface">
+      <HintPath>..\..\..\..\..\..\..\UCCNC\Plugininterface.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>

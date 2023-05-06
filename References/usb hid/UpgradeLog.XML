@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Sniffer">
+</Property><Property Name="Solution File" Value="C:\Users\xbadcode\Downloads\usb_hid\usb hid\Sniffer.sln">
+</Property><Property Name="Date" Value="Sunday, June 02, 2013">
+</Property><Property Name="Time" Value="12:24 PM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="Sniffer.sln" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\Sniffer.sln">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbLibrary.csproj" Description="Project file successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\UsbLibrary.csproj">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\HIDDevice.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\HIDDevice.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\Report.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\Report.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\SpecifiedDevice.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\SpecifiedDevice.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\SpecifiedInputReport.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\SpecifiedInputReport.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\SpecifiedOutputReport.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\SpecifiedOutputReport.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbHidPort.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\UsbHidPort.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbHidPort.Designer.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\UsbHidPort.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\Properties\AssemblyInfo.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\Win32Usb.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\Win32Usb.cs">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbHidBmp.bmp" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbLibrary\UsbHidBmp.bmp">
+</Event><Event ErrorLevel="1" Project="UsbLibrary" Source="UsbLibrary\UsbLibrary.csproj" Description="Your project is targeting .NET Framework 2.0 or 3.0. If your project uses assemblies requiring a newer .NET Framework, your project will fail to build. You can change the .NET Framework version by clicking Properties on the project menu and then selecting a new version in the '.NET Framework' dropdown box. (In Visual Basic, this is located on the Compile tab by clicking the 'Advanced Compiler Options...' button.)">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbLibrary.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="UsbLibrary" Source="UsbLibrary\UsbLibrary.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\UsbApp.csproj" Description="Project file successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\UsbApp.csproj">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Sniffer.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Sniffer.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Sniffer.Designer.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Sniffer.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Program.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Program.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Properties\AssemblyInfo.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Properties\Resources.Designer.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Properties\Resources.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Properties\Settings.Designer.cs" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Properties\Settings.Designer.cs">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Properties\Settings.settings" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Properties\Settings.settings">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Properties\Resources.resx" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Properties\Resources.resx">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\Sniffer.resx" Description="File successfully backed up as C:\Users\xbadcode\Downloads\usb_hid\usb hid\Backup\UsbApp\Sniffer.resx">
+</Event><Event ErrorLevel="1" Project="UsbApp" Source="UsbApp\UsbApp.csproj" Description="Your project is targeting .NET Framework 2.0 or 3.0. If your project uses assemblies requiring a newer .NET Framework, your project will fail to build. You can change the .NET Framework version by clicking Properties on the project menu and then selecting a new version in the '.NET Framework' dropdown box. (In Visual Basic, this is located on the Compile tab by clicking the 'Advanced Compiler Options...' button.)">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\UsbApp.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="UsbApp" Source="UsbApp\UsbApp.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="Sniffer.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="Sniffer.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="UsbLibrary" Source="UsbLibrary\UsbLibrary.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="UsbApp" Source="UsbApp\UsbApp.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>
