@@ -1,0 +1,14 @@
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\bin\Debug\Plugininterface.dll
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\bin\Debug\UCCNC.exe
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\bin\Debug\UCCNC.exe.config
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugins.ConfigForm.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugins.PluginForm.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugins.Properties.Resources.resources
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabs Plugin.csproj.GenerateResource.cache
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabs Plugin.csproj.CoreCompileInputs.cache
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabs Plugin.csproj.CopyComplete
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\bin\Debug\AshLabsPlugin.dll
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\bin\Debug\AshLabsPlugin.pdb
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabsPlugin.dll
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabsPlugin.pdb
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\AshLabs Plugin.csproj.AssemblyReference.cache

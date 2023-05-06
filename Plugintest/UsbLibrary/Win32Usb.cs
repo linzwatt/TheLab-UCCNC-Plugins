@@ -1,40 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 
 namespace UsbLibrary {
-	/// <summary>
-	/// Event handler class for sending data
-	/// </summary>
-	public class DataRecievedEventArgs : EventArgs {
-		public readonly byte[] data;
-		public DataRecievedEventArgs(byte[] data) : base() { this.data = data; } }
-	public delegate void DataRecievedEventHandler(object sender, DataRecievedEventArgs args);
-
-	/// <summary>
-	/// Event handler class for sending data
-	/// </summary>
-	public class DataSendEventArgs : EventArgs {
-		public readonly byte[] data;
-		public DataSendEventArgs(byte[] data) : base() { this.data = data; } }
-	public delegate void DataSendEventHandler(object sender, DataSendEventArgs args);
-
-	/// <summary>
-	/// Exception class for HID devices
-	/// </summary>
-	public class HIDDeviceException : ApplicationException {
-		public HIDDeviceException(string strMessage) : base(strMessage) { }
-
-		public static HIDDeviceException GenerateWithWinError(string strMessage) {
-			return new HIDDeviceException(string.Format("Msg:{0} WinEr:{1:X8}", strMessage, Marshal.GetLastWin32Error())); }
-
-		public static HIDDeviceException GenerateError(string strMessage) {
-			return new HIDDeviceException(string.Format("Msg:{0}", strMessage)); } }
-
 	/// <summary>
 	/// Class that wraps USB API calls and structures.
 	/// </summary>
@@ -51,7 +18,8 @@ namespace UsbLibrary {
 			public uint InternalHigh;
 			public uint Offset;
 			public uint OffsetHigh;
-			public global::System.IntPtr Event; }
+			public global::System.IntPtr Event;
+		}
 
 		/// <summary>
 		/// Provides details about a single USB device
@@ -61,7 +29,8 @@ namespace UsbLibrary {
 			public int Size;
 			public global::System.Guid InterfaceClassGuid;
 			public int Flags;
-			public global::System.IntPtr Reserved; }
+			public global::System.IntPtr Reserved;
+		}
 
 		/// <summary>
 		/// Provides the capabilities of a HID device
@@ -84,7 +53,8 @@ namespace UsbLibrary {
 			public short NumberOutputDataIndices;
 			public short NumberFeatureButtonCaps;
 			public short NumberFeatureValueCaps;
-			public short NumberFeatureDataIndices; }
+			public short NumberFeatureDataIndices;
+		}
 
 		/// <summary>
 		/// Access to the path for a device
@@ -93,14 +63,15 @@ namespace UsbLibrary {
 		public struct DeviceInterfaceDetailData {
 			public int Size;
 
-			[global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.ByValTStr, SizeConst = 256)]
-			public string DevicePath; }
+			[global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.ByValTStr, SizeConst = 0x100)]
+			public string DevicePath;
+		}
 
 		/// <summary>
 		/// Used when registering a window to receive messages about devices added or removed from the system.
 		/// </summary>
 		[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, CharSet = global::System.Runtime.InteropServices.CharSet.Unicode, Pack = 1)]
-		public class DeviceBroadcastInterface {
+		public class DeviceBroadcastInterface{
 			public int Size;
 			public int DeviceType;
 			public int Reserved;
@@ -109,7 +80,8 @@ namespace UsbLibrary {
 			public string Name;
 
 			// Token: 0x06000067 RID: 103
-			public DeviceBroadcastInterface() : base() { } }
+			public DeviceBroadcastInterface() : base() { }
+		}
 		#endregion
 
 		#region Constants
@@ -317,7 +289,8 @@ namespace UsbLibrary {
 		/// <param name="hWnd">Handle to window that will receive messages</param>
 		/// <param name="gClass">Class of devices to get messages for</param>
 		/// <returns>A handle used when unregistering</returns>
-		public static global::System.IntPtr RegisterForUsbEvents(global::System.IntPtr hWnd, global::System.Guid gClass) {
+		public static global::System.IntPtr RegisterForUsbEvents(global::System.IntPtr hWnd, global::System.Guid gClass)
+		{
 			global::UsbLibrary.Win32Usb.DeviceBroadcastInterface deviceBroadcastInterface = new global::UsbLibrary.Win32Usb.DeviceBroadcastInterface();
 			deviceBroadcastInterface.Size = global::System.Runtime.InteropServices.Marshal.SizeOf((object)deviceBroadcastInterface);
 			deviceBroadcastInterface.ClassGuid = gClass;

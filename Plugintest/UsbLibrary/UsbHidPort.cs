@@ -213,7 +213,7 @@ namespace UsbLibrary {
 		/// Checks the devices that are present at the moment and checks if one of those
 		/// is the device you defined by filling in the product id and vendor id.
 		/// </summary>
-		public void CheckDevicePresent() {
+		public void CheckDevicePresent(bool throwMessage) {
 			try {
 				// Mind if the specified device existed before.
 				bool flag = false;
@@ -227,15 +227,25 @@ namespace UsbLibrary {
 					// We did not find it, create a device removed handler
 					if (this.specifiedDeviceRemovedEventHandler != null && flag) {
 						this.specifiedDeviceRemovedEventHandler(this, new global::System.EventArgs()); } 
+					if (throwMessage) { MessageBox.Show("Device not found."); }
 				} else if (this.specifiedDeviceArrivedEventHandler != null) {
 					// We found it!, run the device arrived handler, and invoke the data recieved handler
 					this.specifiedDeviceArrivedEventHandler(this, new global::System.EventArgs());
-					this.specifiedDeviceRead.DataRecieved += this.dataRecievedEventHandler.Invoke; }
+					this.specifiedDeviceRead.DataRecieved += this.dataRecievedEventHandler.Invoke;
+					if (throwMessage) { MessageBox.Show("Device found!"); } }
 
 				// Set the Write handler
 				this.specifiedDeviceWrite = global::UsbLibrary.SpecifiedDevice.FindSpecifiedDevice(this.vendorId, this.productId, true);
-			} catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); } }
+			} catch (Exception ex) { MessageBox.Show("UsbHiDPort.CheckDevicePresent Error.ToString(): '" + ex.ToString() + "'."); } }
+		public void CheckDevicePresent() { this.CheckDevicePresent(false); }
 
+			private void DataRecieved(object sender, global::UsbLibrary.DataRecievedEventArgs args) {
+			if (this.dataRecievedEventHandler != null) {
+				this.dataRecievedEventHandler(sender, args); } }
+
+		private void DataSend(object sender, global::UsbLibrary.DataSendEventArgs args) {
+			if (this.dataSendEventHandler != null) {
+				this.dataSendEventHandler(sender, args); } }
 
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -333,14 +343,6 @@ namespace UsbLibrary {
 			get { return this.specified_device; }
 			set { this.specified_device = value; } } //*/
 
-		private void DataRecieved(object sender, global::UsbLibrary.DataRecievedEventArgs args) {
-			if (this.dataRecievedEventHandler != null) {
-				this.dataRecievedEventHandler(sender, args); } }
-
-		private void DataSend(object sender, global::UsbLibrary.DataSendEventArgs args) {
-			if (this.dataSendEventHandler != null) {
-				this.dataSendEventHandler(sender, args); } }
-
 		[Category("Embedded Details")]
 		[DefaultValue("(none)")]
 		[Description("The Device witch applies to the specifications you set")]
@@ -356,9 +358,10 @@ namespace UsbLibrary {
 		/// <summary>
 		/// Wrapper for sending data to the specified device, using a byte array.  
 		/// </summary>
-		public void SendData(byte[] data) { 
+		public void SendData(byte[] data) {
 			if (this.SpecifiedDeviceWrite != null) {
 				this.SpecifiedDeviceWrite.SendData(data); } }
+
 		/// <summary>
 		/// Wrapper for sending data to the specified device, using a multi dimensional jagged byte array, indicating bytes to write in order.  
 		/// </summary>

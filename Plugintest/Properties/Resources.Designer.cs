@@ -63,9 +63,69 @@ namespace Plugins.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AlwaysOnTop {
+            get {
+                object obj = ResourceManager.GetObject("AlwaysOnTop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AlwaysOnTopBlack {
+            get {
+                object obj = ResourceManager.GetObject("AlwaysOnTopBlack", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon MpgNotifyIcon {
+            get {
+                object obj = ResourceManager.GetObject("MpgNotifyIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MpgNotifyIcon_ico {
             get {
                 object obj = ResourceManager.GetObject("MpgNotifyIcon.ico", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon N_Icon {
+            get {
+                object obj = ResourceManager.GetObject("N_Icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UsbHidBmp {
+            get {
+                object obj = ResourceManager.GetObject("UsbHidBmp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap WHB4_04 {
+            get {
+                object obj = ResourceManager.GetObject("WHB4_04", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

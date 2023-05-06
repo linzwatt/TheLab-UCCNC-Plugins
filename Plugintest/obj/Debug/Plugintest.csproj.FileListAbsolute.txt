@@ -11,3 +11,4 @@ C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugintest
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugintest.csproj.CopyComplete
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugintest.dll
 C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugintest.pdb
+C:\Users\Samua\source\repos\TheLab-UCCNC-Plugins\Plugintest\obj\Debug\Plugins.Properties.Resources.resources

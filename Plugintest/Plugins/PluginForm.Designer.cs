@@ -1,108 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using Plugininterface;
-using Plugins.Properties;
-using UsbLibrary;
+﻿namespace Plugins
+{
+    partial class PluginForm
+    {
+        public global::System.Windows.Forms.NotifyIcon mpgNotifyIcon;
+        // Labels
+        private global::System.Windows.Forms.Label mCodeLabel;
+        private global::System.Windows.Forms.Label macroLabel08;
+        private global::System.Windows.Forms.Label macroLabel10;
+        private global::System.Windows.Forms.Label macroLabel09;
+        private global::System.Windows.Forms.Label macroLabel05;
+        private global::System.Windows.Forms.Label macroLabel04;
+        private global::System.Windows.Forms.Label usbConnectionStatus;
+        private global::System.Windows.Forms.Label mpgFilterConstantLabel;
+        private global::System.Windows.Forms.Label mpgSpeedMultiplierLabel;
+        private global::System.Windows.Forms.Label uccncFunctionLabelMain;
+        private global::System.Windows.Forms.Label macroLabel07;
+        private global::System.Windows.Forms.Label macroLabel06;
+        private global::System.Windows.Forms.Label macroLabel03;
+        private global::System.Windows.Forms.Label macroLabel02;
+        private global::System.Windows.Forms.Label macroLabel01;
+        // TextBoxes
+        private global::System.Windows.Forms.TextBox mpgSpeedMultiplierTextBox;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox01;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox02;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox03;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox04;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox05;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox06;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox07;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox08;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox09;
+        private global::System.Windows.Forms.TextBox macroCodeNoTextBox10;
+        private global::System.Windows.Forms.TextBox bigTextBox;
+        // Buttons
+        private global::System.Windows.Forms.Button findDeviceButton;
+        // GroupBoxes
+        private global::System.Windows.Forms.GroupBox pendantSettings;
+        // ComboBoxes
+        private global::System.Windows.Forms.ComboBox mpgFilterCombobox;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro01;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro02;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro03;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro04;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro05;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro06;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro07;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro08;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro09;
+        private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro10;
+        // CheckBoxes
+        private global::System.Windows.Forms.CheckBox functionOrMacro01;
+        private global::System.Windows.Forms.CheckBox functionOrMacro02;
+        private global::System.Windows.Forms.CheckBox functionOrMacro03;
+        private global::System.Windows.Forms.CheckBox functionOrMacro04;
+        private global::System.Windows.Forms.CheckBox functionOrMacro05;
+        private global::System.Windows.Forms.CheckBox functionOrMacro06;
+        private global::System.Windows.Forms.CheckBox functionOrMacro07;
+        private global::System.Windows.Forms.CheckBox functionOrMacro08;
+        private global::System.Windows.Forms.CheckBox functionOrMacro09;
+        private global::System.Windows.Forms.CheckBox functionOrMacro10;
+        // PictureBoxes
+        private global::System.Windows.Forms.PictureBox pictureBox;
 
-namespace Plugins {
-    partial class PluginForm {
-		private global::System.ComponentModel.ComponentResourceManager componentResourceManager = null;
-		public global::System.Windows.Forms.NotifyIcon mpgNotifyIcon;
-		// Labels
-		private global::System.Windows.Forms.Label mCodeLabel;
-		private global::System.Windows.Forms.Label macroLabel08;
-		private global::System.Windows.Forms.Label macroLabel10;
-		private global::System.Windows.Forms.Label macroLabel09;
-		private global::System.Windows.Forms.Label macroLabel05;
-		private global::System.Windows.Forms.Label macroLabel04;
-		private global::System.Windows.Forms.Label usbConnectionStatus;
-		private global::System.Windows.Forms.Label mpgFilterConstantLabel;
-		private global::System.Windows.Forms.Label mpgSpeedMultiplierLabel;
-		private global::System.Windows.Forms.Label uccncFunctionLabelMain;
-		private global::System.Windows.Forms.Label macroLabel07;
-		private global::System.Windows.Forms.Label macroLabel06;
-		private global::System.Windows.Forms.Label macroLabel03;
-		private global::System.Windows.Forms.Label macroLabel02;
-		private global::System.Windows.Forms.Label macroLabel01;
-		// TextBoxes
-		private global::System.Windows.Forms.TextBox mpgSpeedMultiplierTextBox;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox01;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox02;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox03;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox04;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox05;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox06;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox07;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox08;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox09;
-		private global::System.Windows.Forms.TextBox macroCodeNoTextBox10;
-		private global::System.Windows.Forms.TextBox bigTextBox;
-		// Buttons
-		private global::System.Windows.Forms.Button findDeviceButton;
-		// GroupBoxes
-		private global::System.Windows.Forms.GroupBox pendantSettings;
-		// ComboBoxes
-		private global::System.Windows.Forms.ComboBox mpgFilterCombobox;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro01;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro02;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro03;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro04;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro05;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro06;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro07;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro08;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro09;
-		private global::System.Windows.Forms.ComboBox functiondescriptionsComboboxMacro10;
-		// CheckBoxes
-		private global::System.Windows.Forms.CheckBox functionOrMacro01;
-		private global::System.Windows.Forms.CheckBox functionOrMacro02;
-		private global::System.Windows.Forms.CheckBox functionOrMacro03;
-		private global::System.Windows.Forms.CheckBox functionOrMacro04;
-		private global::System.Windows.Forms.CheckBox functionOrMacro05;
-		private global::System.Windows.Forms.CheckBox functionOrMacro06;
-		private global::System.Windows.Forms.CheckBox functionOrMacro07;
-		private global::System.Windows.Forms.CheckBox functionOrMacro08;
-		private global::System.Windows.Forms.CheckBox functionOrMacro09;
-		private global::System.Windows.Forms.CheckBox functionOrMacro10;
-		// PictureBoxes
-		private global::System.Windows.Forms.PictureBox pictureBox;
-		// ##############################################
-		// Destructors
-		// ##############################################
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing) {
-			if (disposing && this.components != null) {
-				this.components.Dispose(); }
-			base.Dispose(disposing);
-		}
-		// ##############################################
-		// InitializeComponentr
-		// ##############################################
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		/// 
-		private void InitializeComponent() {
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PluginForm));
             this.mpgNotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.functionOrMacro01 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro02 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro03 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro04 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro05 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro06 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro07 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro08 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro09 = new System.Windows.Forms.CheckBox();
-            this.functionOrMacro10 = new System.Windows.Forms.CheckBox();
             this.bigTextBox = new System.Windows.Forms.TextBox();
             this.findDeviceButton = new System.Windows.Forms.Button();
             this.functiondescriptionsComboboxMacro01 = new System.Windows.Forms.ComboBox();
@@ -115,6 +98,16 @@ namespace Plugins {
             this.functiondescriptionsComboboxMacro08 = new System.Windows.Forms.ComboBox();
             this.functiondescriptionsComboboxMacro09 = new System.Windows.Forms.ComboBox();
             this.functiondescriptionsComboboxMacro10 = new System.Windows.Forms.ComboBox();
+            this.functionOrMacro01 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro02 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro03 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro04 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro05 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro06 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro07 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro08 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro09 = new System.Windows.Forms.CheckBox();
+            this.functionOrMacro10 = new System.Windows.Forms.CheckBox();
             this.macroCodeNoTextBox01 = new System.Windows.Forms.TextBox();
             this.macroCodeNoTextBox02 = new System.Windows.Forms.TextBox();
             this.macroCodeNoTextBox03 = new System.Windows.Forms.TextBox();
@@ -144,14 +137,125 @@ namespace Plugins {
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.uccncFunctionLabelMain = new System.Windows.Forms.Label();
             this.usbConnectionStatus = new System.Windows.Forms.Label();
-            this.pendantSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // mpgNotifyIcon
             // 
+            this.mpgNotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("mpgNotifyIcon.Icon")));
             this.mpgNotifyIcon.Text = "AshLabs Plugin Interface";
             this.mpgNotifyIcon.Visible = true;
+            this.mpgNotifyIcon.Click += this.ShowForm;
+            // 
+            // bigTextBox
+            // 
+            this.bigTextBox.Location = new System.Drawing.Point(286, 305);
+            this.bigTextBox.Multiline = true;
+            this.bigTextBox.Name = "bigTextBox";
+            this.bigTextBox.Size = new System.Drawing.Size(190, 153);
+            this.bigTextBox.TabIndex = 400;
+            this.bigTextBox.Visible = false;
+            // 
+            // findDeviceButton
+            // 
+            this.findDeviceButton.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.findDeviceButton.Location = new System.Drawing.Point(193, 419);
+            this.findDeviceButton.Name = "findDeviceButton";
+            this.findDeviceButton.Size = new System.Drawing.Size(86, 40);
+            this.findDeviceButton.TabIndex = 323;
+            this.findDeviceButton.Text = "Find Pendant";
+            this.findDeviceButton.UseVisualStyleBackColor = true;
+            this.findDeviceButton.Click += new System.EventHandler(this.findDeviceButton_Click);
+            // 
+            // functiondescriptionsComboboxMacro01
+            // 
+            this.functiondescriptionsComboboxMacro01.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro01.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro01.Location = new System.Drawing.Point(152, 31);
+            this.functiondescriptionsComboboxMacro01.Name = "functiondescriptionsComboboxMacro01";
+            this.functiondescriptionsComboboxMacro01.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro01.TabIndex = 334;
+            // 
+            // functiondescriptionsComboboxMacro02
+            // 
+            this.functiondescriptionsComboboxMacro02.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro02.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro02.Location = new System.Drawing.Point(152, 57);
+            this.functiondescriptionsComboboxMacro02.Name = "functiondescriptionsComboboxMacro02";
+            this.functiondescriptionsComboboxMacro02.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro02.TabIndex = 335;
+            // 
+            // functiondescriptionsComboboxMacro03
+            // 
+            this.functiondescriptionsComboboxMacro03.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro03.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro03.Location = new System.Drawing.Point(152, 83);
+            this.functiondescriptionsComboboxMacro03.Name = "functiondescriptionsComboboxMacro03";
+            this.functiondescriptionsComboboxMacro03.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro03.TabIndex = 336;
+            // 
+            // functiondescriptionsComboboxMacro04
+            // 
+            this.functiondescriptionsComboboxMacro04.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro04.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro04.Location = new System.Drawing.Point(152, 109);
+            this.functiondescriptionsComboboxMacro04.Name = "functiondescriptionsComboboxMacro04";
+            this.functiondescriptionsComboboxMacro04.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro04.TabIndex = 367;
+            // 
+            // functiondescriptionsComboboxMacro05
+            // 
+            this.functiondescriptionsComboboxMacro05.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro05.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro05.Location = new System.Drawing.Point(152, 135);
+            this.functiondescriptionsComboboxMacro05.Name = "functiondescriptionsComboboxMacro05";
+            this.functiondescriptionsComboboxMacro05.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro05.TabIndex = 368;
+            // 
+            // functiondescriptionsComboboxMacro06
+            // 
+            this.functiondescriptionsComboboxMacro06.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro06.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro06.Location = new System.Drawing.Point(152, 161);
+            this.functiondescriptionsComboboxMacro06.Name = "functiondescriptionsComboboxMacro06";
+            this.functiondescriptionsComboboxMacro06.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro06.TabIndex = 337;
+            // 
+            // functiondescriptionsComboboxMacro07
+            // 
+            this.functiondescriptionsComboboxMacro07.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro07.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro07.Location = new System.Drawing.Point(152, 187);
+            this.functiondescriptionsComboboxMacro07.Name = "functiondescriptionsComboboxMacro07";
+            this.functiondescriptionsComboboxMacro07.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro07.TabIndex = 338;
+            // 
+            // functiondescriptionsComboboxMacro08
+            // 
+            this.functiondescriptionsComboboxMacro08.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro08.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro08.Location = new System.Drawing.Point(152, 213);
+            this.functiondescriptionsComboboxMacro08.Name = "functiondescriptionsComboboxMacro08";
+            this.functiondescriptionsComboboxMacro08.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro08.TabIndex = 393;
+            // 
+            // functiondescriptionsComboboxMacro09
+            // 
+            this.functiondescriptionsComboboxMacro09.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro09.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro09.Location = new System.Drawing.Point(152, 239);
+            this.functiondescriptionsComboboxMacro09.Name = "functiondescriptionsComboboxMacro09";
+            this.functiondescriptionsComboboxMacro09.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro09.TabIndex = 381;
+            // 
+            // functiondescriptionsComboboxMacro10
+            // 
+            this.functiondescriptionsComboboxMacro10.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.functiondescriptionsComboboxMacro10.FormattingEnabled = true;
+            this.functiondescriptionsComboboxMacro10.Location = new System.Drawing.Point(152, 265);
+            this.functiondescriptionsComboboxMacro10.Name = "functiondescriptionsComboboxMacro10";
+            this.functiondescriptionsComboboxMacro10.Size = new System.Drawing.Size(276, 21);
+            this.functiondescriptionsComboboxMacro10.TabIndex = 382;
             // 
             // functionOrMacro01
             // 
@@ -272,115 +376,6 @@ namespace Plugins {
             this.functionOrMacro10.Tag = "doFunctionCheckBoxes";
             this.functionOrMacro10.UseVisualStyleBackColor = true;
             this.functionOrMacro10.CheckedChanged += new System.EventHandler(this.FunctionOrMacro);
-            // 
-            // bigTextBox
-            // 
-            this.bigTextBox.Location = new System.Drawing.Point(286, 305);
-            this.bigTextBox.Multiline = true;
-            this.bigTextBox.Name = "bigTextBox";
-            this.bigTextBox.Size = new System.Drawing.Size(190, 153);
-            this.bigTextBox.TabIndex = 400;
-            this.bigTextBox.Visible = false;
-            // 
-            // findDeviceButton
-            // 
-            this.findDeviceButton.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.findDeviceButton.Location = new System.Drawing.Point(193, 419);
-            this.findDeviceButton.Name = "findDeviceButton";
-            this.findDeviceButton.Size = new System.Drawing.Size(86, 40);
-            this.findDeviceButton.TabIndex = 323;
-            this.findDeviceButton.Text = "Find Pendant";
-            this.findDeviceButton.UseVisualStyleBackColor = true;
-            // 
-            // functiondescriptionsComboboxMacro01
-            // 
-            this.functiondescriptionsComboboxMacro01.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro01.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro01.Location = new System.Drawing.Point(152, 31);
-            this.functiondescriptionsComboboxMacro01.Name = "functiondescriptionsComboboxMacro01";
-            this.functiondescriptionsComboboxMacro01.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro01.TabIndex = 334;
-            // 
-            // functiondescriptionsComboboxMacro02
-            // 
-            this.functiondescriptionsComboboxMacro02.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro02.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro02.Location = new System.Drawing.Point(152, 57);
-            this.functiondescriptionsComboboxMacro02.Name = "functiondescriptionsComboboxMacro02";
-            this.functiondescriptionsComboboxMacro02.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro02.TabIndex = 335;
-            // 
-            // functiondescriptionsComboboxMacro03
-            // 
-            this.functiondescriptionsComboboxMacro03.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro03.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro03.Location = new System.Drawing.Point(152, 83);
-            this.functiondescriptionsComboboxMacro03.Name = "functiondescriptionsComboboxMacro03";
-            this.functiondescriptionsComboboxMacro03.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro03.TabIndex = 336;
-            // 
-            // functiondescriptionsComboboxMacro04
-            // 
-            this.functiondescriptionsComboboxMacro04.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro04.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro04.Location = new System.Drawing.Point(152, 109);
-            this.functiondescriptionsComboboxMacro04.Name = "functiondescriptionsComboboxMacro04";
-            this.functiondescriptionsComboboxMacro04.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro04.TabIndex = 367;
-            // 
-            // functiondescriptionsComboboxMacro05
-            // 
-            this.functiondescriptionsComboboxMacro05.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro05.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro05.Location = new System.Drawing.Point(152, 135);
-            this.functiondescriptionsComboboxMacro05.Name = "functiondescriptionsComboboxMacro05";
-            this.functiondescriptionsComboboxMacro05.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro05.TabIndex = 368;
-            // 
-            // functiondescriptionsComboboxMacro06
-            // 
-            this.functiondescriptionsComboboxMacro06.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro06.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro06.Location = new System.Drawing.Point(152, 161);
-            this.functiondescriptionsComboboxMacro06.Name = "functiondescriptionsComboboxMacro06";
-            this.functiondescriptionsComboboxMacro06.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro06.TabIndex = 337;
-            // 
-            // functiondescriptionsComboboxMacro07
-            // 
-            this.functiondescriptionsComboboxMacro07.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro07.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro07.Location = new System.Drawing.Point(152, 187);
-            this.functiondescriptionsComboboxMacro07.Name = "functiondescriptionsComboboxMacro07";
-            this.functiondescriptionsComboboxMacro07.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro07.TabIndex = 338;
-            // 
-            // functiondescriptionsComboboxMacro08
-            // 
-            this.functiondescriptionsComboboxMacro08.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro08.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro08.Location = new System.Drawing.Point(152, 213);
-            this.functiondescriptionsComboboxMacro08.Name = "functiondescriptionsComboboxMacro08";
-            this.functiondescriptionsComboboxMacro08.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro08.TabIndex = 393;
-            // 
-            // functiondescriptionsComboboxMacro09
-            // 
-            this.functiondescriptionsComboboxMacro09.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro09.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro09.Location = new System.Drawing.Point(152, 239);
-            this.functiondescriptionsComboboxMacro09.Name = "functiondescriptionsComboboxMacro09";
-            this.functiondescriptionsComboboxMacro09.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro09.TabIndex = 381;
-            // 
-            // functiondescriptionsComboboxMacro10
-            // 
-            this.functiondescriptionsComboboxMacro10.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.functiondescriptionsComboboxMacro10.FormattingEnabled = true;
-            this.functiondescriptionsComboboxMacro10.Location = new System.Drawing.Point(152, 265);
-            this.functiondescriptionsComboboxMacro10.Name = "functiondescriptionsComboboxMacro10";
-            this.functiondescriptionsComboboxMacro10.Size = new System.Drawing.Size(276, 21);
-            this.functiondescriptionsComboboxMacro10.TabIndex = 382;
             // 
             // macroCodeNoTextBox01
             // 
@@ -654,6 +649,7 @@ namespace Plugins {
             this.mpgSpeedMultiplierTextBox.Size = new System.Drawing.Size(57, 20);
             this.mpgSpeedMultiplierTextBox.TabIndex = 10;
             this.mpgSpeedMultiplierTextBox.Text = "10";
+            this.mpgSpeedMultiplierTextBox.KeyUp += this.SetMPGspeedMultiplierFromTextBox;
             // 
             // pendantSettings
             // 
@@ -667,11 +663,10 @@ namespace Plugins {
             this.pendantSettings.TabIndex = 351;
             this.pendantSettings.TabStop = false;
             this.pendantSettings.Text = "Pendant Settings";
-            this.pendantSettings.Enter += new System.EventHandler(this.groupBox_Enter);
             // 
             // pictureBox
             // 
-            this.pictureBox.Image = global::Plugins_Properties_Resources.WHB4_04;
+            this.pictureBox.Image = global::Plugins.Properties.Resources.WHB4_04;
             this.pictureBox.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.pictureBox.Location = new System.Drawing.Point(482, 305);
             this.pictureBox.Name = "pictureBox";
@@ -701,75 +696,74 @@ namespace Plugins {
             // 
             // PluginForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            base.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(571, 468);
-            this.Controls.Add(this.pictureBox);
-            this.Controls.Add(this.macroLabel01);
-            this.Controls.Add(this.macroLabel02);
-            this.Controls.Add(this.macroLabel03);
-            this.Controls.Add(this.macroLabel04);
-            this.Controls.Add(this.macroLabel05);
-            this.Controls.Add(this.macroLabel06);
-            this.Controls.Add(this.macroLabel07);
-            this.Controls.Add(this.macroLabel08);
-            this.Controls.Add(this.macroLabel09);
-            this.Controls.Add(this.macroLabel10);
-            this.Controls.Add(this.mCodeLabel);
-            this.Controls.Add(this.macroCodeNoTextBox01);
-            this.Controls.Add(this.macroCodeNoTextBox02);
-            this.Controls.Add(this.macroCodeNoTextBox03);
-            this.Controls.Add(this.macroCodeNoTextBox04);
-            this.Controls.Add(this.macroCodeNoTextBox05);
-            this.Controls.Add(this.macroCodeNoTextBox06);
-            this.Controls.Add(this.macroCodeNoTextBox07);
-            this.Controls.Add(this.macroCodeNoTextBox08);
-            this.Controls.Add(this.macroCodeNoTextBox09);
-            this.Controls.Add(this.macroCodeNoTextBox10);
-            this.Controls.Add(this.bigTextBox);
-            this.Controls.Add(this.functionOrMacro08);
-            this.Controls.Add(this.functionOrMacro10);
-            this.Controls.Add(this.functionOrMacro09);
-            this.Controls.Add(this.functionOrMacro05);
-            this.Controls.Add(this.functionOrMacro04);
-            this.Controls.Add(this.functionOrMacro07);
-            this.Controls.Add(this.functionOrMacro06);
-            this.Controls.Add(this.functionOrMacro03);
-            this.Controls.Add(this.functionOrMacro02);
-            this.Controls.Add(this.functionOrMacro01);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro01);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro02);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro03);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro04);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro05);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro06);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro07);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro08);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro09);
-            this.Controls.Add(this.functiondescriptionsComboboxMacro10);
-            this.Controls.Add(this.usbConnectionStatus);
-            this.Controls.Add(this.pendantSettings);
-            this.Controls.Add(this.uccncFunctionLabelMain);
-            this.Controls.Add(this.findDeviceButton);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "PluginForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            base.ClientSize = new System.Drawing.Size(571, 468);
+            base.Controls.Add(this.pictureBox);
+            base.Controls.Add(this.macroLabel01);
+            base.Controls.Add(this.macroLabel02);
+            base.Controls.Add(this.macroLabel03);
+            base.Controls.Add(this.macroLabel04);
+            base.Controls.Add(this.macroLabel05);
+            base.Controls.Add(this.macroLabel06);
+            base.Controls.Add(this.macroLabel07);
+            base.Controls.Add(this.macroLabel08);
+            base.Controls.Add(this.macroLabel09);
+            base.Controls.Add(this.macroLabel10);
+            base.Controls.Add(this.mCodeLabel);
+            base.Controls.Add(this.macroCodeNoTextBox01);
+            base.Controls.Add(this.macroCodeNoTextBox02);
+            base.Controls.Add(this.macroCodeNoTextBox03);
+            base.Controls.Add(this.macroCodeNoTextBox04);
+            base.Controls.Add(this.macroCodeNoTextBox05);
+            base.Controls.Add(this.macroCodeNoTextBox06);
+            base.Controls.Add(this.macroCodeNoTextBox07);
+            base.Controls.Add(this.macroCodeNoTextBox08);
+            base.Controls.Add(this.macroCodeNoTextBox09);
+            base.Controls.Add(this.macroCodeNoTextBox10);
+            base.Controls.Add(this.bigTextBox);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro01);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro02);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro03);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro04);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro05);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro06);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro07);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro08);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro09);
+            base.Controls.Add(this.functiondescriptionsComboboxMacro10);
+            base.Controls.Add(this.functionOrMacro08);
+            base.Controls.Add(this.functionOrMacro10);
+            base.Controls.Add(this.functionOrMacro09);
+            base.Controls.Add(this.functionOrMacro05);
+            base.Controls.Add(this.functionOrMacro04);
+            base.Controls.Add(this.functionOrMacro07);
+            base.Controls.Add(this.functionOrMacro06);
+            base.Controls.Add(this.functionOrMacro03);
+            base.Controls.Add(this.functionOrMacro02);
+            base.Controls.Add(this.functionOrMacro01);
+            base.Controls.Add(this.usbConnectionStatus);
+            base.Controls.Add(this.pendantSettings);
+            base.Controls.Add(this.uccncFunctionLabelMain);
+            base.Controls.Add(this.findDeviceButton);
+            base.Icon = ((System.Drawing.Icon)(resources.GetObject("mpgNotifyIcon.Icon")));
+            base.MaximizeBox = false;
+            base.MinimizeBox = false;
+            base.Name = "PluginForm";
+            base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AshLabs Plugin";
-            this.TopMost = true;
+            base.TopMost = true;
+            base.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PluginForm_FormClosing);
+            base.Load += new System.EventHandler(this.PluginForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.pendantSettings.ResumeLayout(false);
             this.pendantSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
-		}
-
-        private IContainer components;
+            base.ResumeLayout(false);
+            base.PerformLayout();
+        }
         #endregion
-        // ##############################################
-        // END
-        // ##############################################
+
+        private System.ComponentModel.IContainer components;
     }
 }
