@@ -2,48 +2,22 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using UsbLibrary;
+using Pendant;
 
 namespace Plugins {
     public class UCCNCplugin {
-        public struct ButtonRegister {
-            public bool Reset;
-            public bool Stop;
-            public bool GotoZero;
-            public bool StartPause;
-            public bool ProbeZ;
-            public bool Spindle;
-            public bool Null;
-            public bool SafeZ;
-            public bool FeedPlus;
-            public bool FeedMinus;
-            public bool SpindlePlus;
-            public bool SpindleMinus;
-            public bool Home;
-            public bool Macro1;
-            public bool Macro2;
-            public bool Macro3;
-            public bool Macro4;
-            public bool Macro5;
-            public bool Macro6;
-            public bool Macro7;
-            public bool Macro8;
-            public bool Macro9;
-            public bool Macro10;
-            public bool StepMode;
-            public bool ContinuousMode;
-        }
-
+        public const double toolGaugeHeight = -1.1750;
+        public static readonly string assemblyVersion = "3.8.0.0";
         public Plugininterface.Entry UC;
         PluginForm PF;
-        internal UsbLibrary.UsbHidPort usb;
-        private UCCNCplugin.ButtonRegister buttonRegister01;
-        private UCCNCplugin.ButtonRegister buttonRegister02;
+        internal WHB4_04_Pendant pendant;
+        private WHB4_04_Pendant.ButtonRegister buttonRegister;
+        private WHB4_04_Pendant.ButtonRegister oldButtonRegister;
         private bool loopFirstRun = true;
         public bool loopstop;
         public bool loopworking;
-        public string assemblyVersion = "3.8.0.0";
         private int loopCount;
-        public byte[][] writeBuffer = null;
         public byte selectedAxis;
 
         private int[] functionCodes;
@@ -63,38 +37,30 @@ namespace Plugins {
         private int __tmAbybR6so;
         private int __bq3b8ROAwH;
         private int __oWcbuNLLed;
-        private double __fkwbfUPG3J;
+        private double jogSpeed;
         private double __t8BbhdSDhT;
         private int[] __LcabRmTEUe = new int[28];
 
         public UCCNCplugin() : base() {
-            this.loopFirstRun = true;
-            this.assemblyVersion = "3.8.0.0"; }
+            this.loopFirstRun = true; }
 
         //Called when the plugin is initialised.
         //The parameter is the Plugin interface object which contains all functions prototypes for calls and callbacks.
         public void Init_event(Plugininterface.Entry UC) {
             try {
                 this.UC = UC;
-
-                // Initialise variables
-                this.writeBuffer = new byte[3][];
-                for (int i = 0; i < this.writeBuffer.Length; i++) {
-                    this.writeBuffer[i] = new byte[8];
-                }
-
                 // Initialise the plugin form
                 this.PF = new PluginForm(this);
 
                 // Instantiate the USB HiD Port interface
-                this.usb = new global::UsbLibrary.UsbHidPort(this.PF.Components);
-                this.usb.OnSpecifiedDeviceArrived += this.USBspecifiedDeviceArrived;
-                this.usb.OnSpecifiedDeviceRemoved += this.USBspecifiedDeviceRemoved;
-                this.usb.OnDeviceArrived += this.USBdeviceArrived;
-                this.usb.OnDeviceRemoved += this.USBdeviceRemoved;
-                this.usb.OnDataRecieved += this.DataRecieved;
+                this.pendant = new WHB4_04_Pendant(this, this.PF.Components);
+                this.pendant.specifiedDeviceArrivedEventHandlers += this.PF.USBspecifiedDeviceArrived;
+                this.pendant.specifiedDeviceRemovedEventHandlers += this.PF.USBspecifiedDeviceRemoved;
+                this.pendant.deviceArrivedEventHandlers += this.PF.USBdeviceArrived;
+                this.pendant.deviceRemovedEventHandlers += this.PF.USBdeviceRemoved;
+                this.pendant.dataRecievedEventHandlers += this.PF.DataRecieved;
                 // Check for the device, and configure the HiD thingo
-                this.CheckDevicePresent();
+                this.pendant.CheckDevicePresent();
 
                 // Further initialise the widgets
                 global::System.Collections.Generic.List<global::Plugininterface.Entry.Functionproperties> list = this.UC.Getbuttonsdescriptions();
@@ -120,13 +86,17 @@ namespace Plugins {
             try {
                 Properties.author = "SaMnMaX - (Decompiled Shad's work)";
                 Properties.pluginname = "Ashlabs WB404 Pendant Plugin";
-                Properties.pluginversion = this.assemblyVersion;
+                Properties.pluginversion = UCCNCplugin.assemblyVersion;
                 return Properties;
             } catch (Exception ex) { MessageBox.Show("UCCNCplugin.Getproperties_event Error.ToString(): '" + ex.ToString() + "'."); } return null; }
 
         //Called from UCCNC when the user presses the Configuration button in the Plugin configuration menu.
         //Typically the plugin configuration window is shown to the user.
-        public void Configure_event() { new global::Plugins.ConfigForm().ShowDialog(); }
+        public void Configure_event() { 
+            new global::Plugins.ConfigForm().ShowDialog(); 
+
+            this.PF.ShowForm(this, new EventArgs());
+        } //TODO plug the wossisname here
 
         //Called from UCCNC when the plugin is loaded and started.
         public void Startup_event() {
@@ -134,7 +104,7 @@ namespace Plugins {
                 this.PF = new global::Plugins.PluginForm(this); }
             global::System.Threading.Thread.Sleep(0x14);
             this.loopstop = false;
-            this.PF.Text = "AshLabs Plugin V" + this.assemblyVersion;
+            this.PF.Text = "AshLabs Plugin V" + UCCNCplugin.assemblyVersion;
             this.loopstop = false;
         }
 
@@ -263,127 +233,23 @@ namespace Plugins {
             //MessageBox.Show("Cycle is starting...");
         }
 
-        // Useful functions
+        // Send data to the pendant display
+        public void SendDisplayData() { //DataRecieved
+            try {
+                this.pendant.selectedAxis = this.selectedAxis;
+                this.pendant.SendDisplayData();
+            } catch (Exception ex) { MessageBox.Show("UCCNCplugin.SendDisplayData Error.ToString(): '" + ex.ToString() + "'."); } }
+
+        #region Public Utilities
         public double FeedRate() {
             double returnValue = 0.0;
             double.TryParse(this.UC.Getfield(true, 867), out returnValue);
-            return returnValue;
-        }
+            return returnValue; }
 
         public double SpindleSpeed() {
             double returnValue = 0.0;
             double.TryParse(this.UC.Getfield(true, 869), out returnValue);
-            return returnValue;
-        }
-
-        private double FilterAxisPosition(double axisPosition) {
-            if (axisPosition >= 0.0) { return (axisPosition * 10000.0 + 0.5) / 10000.0;
-            } else { return (axisPosition * 10000.0 - 0.5) / 10000.0; } }
-
-        private int DecimalSigned(double axisPosition) {
-            int returnValue = (int)((Math.Abs(axisPosition) - (double)((int)Math.Abs(axisPosition))) * 10000.0);
-            if (axisPosition < 0.0) { returnValue |= 32768; }
-            return returnValue;
-        }
-
-        // Send data to the pendant display
-        public void SendDisplayData() {
-            try {
-                // Get the axis positions
-                double xposFiltered = this.FilterAxisPosition(this.UC.GetXpos());
-                int xposABS = (int)Math.Abs(xposFiltered);
-                int xposDecSigned = this.DecimalSigned(xposFiltered);
-                double yposFiltered = this.FilterAxisPosition(this.UC.GetYpos());
-                int yposABS = (int)Math.Abs(yposFiltered);
-                int yposDecSigned = this.DecimalSigned(yposFiltered);
-                double zposFiltered = this.FilterAxisPosition(this.UC.GetZpos());
-                int zposABS = (int)Math.Abs(zposFiltered);
-                int zposDecSigned = this.DecimalSigned(zposFiltered);
-                double aposFiltered = this.FilterAxisPosition(this.UC.GetApos());
-                int aposABS = (int)Math.Abs(aposFiltered);
-                int aposDecSigned = this.DecimalSigned(aposFiltered);
-                double bposFiltered = this.FilterAxisPosition(this.UC.GetBpos());
-                int bposABS = (int)Math.Abs(bposFiltered);
-                int bposDecSigned = this.DecimalSigned(bposFiltered);
-                double cposFiltered = this.FilterAxisPosition(this.UC.GetCpos());
-                int cposABS = (int)Math.Abs(cposFiltered);
-                int cposDecSigned = this.DecimalSigned(cposFiltered);
-
-                // Get the Setfeedrate
-                int feedRate = (int)Math.Abs(this.FeedRate());
-
-                // Get the Setspindlespeed
-                int spindleSpeed = (int)Math.Abs(this.SpindleSpeed());
-
-                // First packet constants
-                this.writeBuffer[0][0] = 6;
-                this.writeBuffer[0][1] = 254;
-                this.writeBuffer[0][2] = 253;
-                this.writeBuffer[0][3] = 12;
-                // Second packet constants
-                this.writeBuffer[1][0] = 6;
-                // Third packet constants
-                this.writeBuffer[2][0] = 6;
-                this.writeBuffer[2][3] = (byte)(feedRate & 255);
-                this.writeBuffer[2][4] = (byte)(feedRate >> 8);
-                this.writeBuffer[2][5] = (byte)(spindleSpeed & 255);
-                this.writeBuffer[2][6] = (byte)(spindleSpeed >> 8);
-                this.writeBuffer[2][7] = (byte)(cposABS & 255);
-
-                // Setting a Reset state or the MPGmodesingle hmm...   
-                if (this.UC.GetLED(25)) {
-                    this.writeBuffer[0][4] = 0 | 64;
-                } else if (this.UC.GetLED(153)) { this.writeBuffer[0][4] = 0 | 1; }
-
-                // Setting axis info, depending on the selected axis state
-                if (this.selectedAxis >= 4) {
-                    // For the First packet
-                    this.writeBuffer[0][5] = (byte)(aposABS & 255);
-                    this.writeBuffer[0][6] = (byte)(aposABS >> 8);
-                    this.writeBuffer[0][7] = (byte)(aposDecSigned & 255);
-
-                    // For the second packet
-                    this.writeBuffer[1][1] = (byte)(aposDecSigned >> 8);
-                    this.writeBuffer[1][2] = (byte)(bposABS & 255);
-                    this.writeBuffer[1][3] = (byte)(bposABS >> 8);
-                    this.writeBuffer[1][4] = (byte)(bposDecSigned & 255);
-                    this.writeBuffer[1][5] = (byte)(bposDecSigned >> 8);
-                    this.writeBuffer[1][6] = (byte)(cposABS & 255);
-                    this.writeBuffer[1][7] = (byte)(cposABS >> 8);
-
-                    // For the third packet
-                    this.writeBuffer[2][1] = (byte)(cposDecSigned & 255);
-                    this.writeBuffer[2][2] = (byte)(cposDecSigned >> 8);
-                } else {
-                    this.writeBuffer[0][5] = (byte)(xposABS & 255);
-                    this.writeBuffer[0][6] = (byte)(xposABS >> 8);
-                    this.writeBuffer[0][7] = (byte)(xposDecSigned & 255);
-
-                    // For the second packet
-                    this.writeBuffer[1][1] = (byte)(xposDecSigned >> 8);
-                    this.writeBuffer[1][2] = (byte)(yposABS & 255);
-                    this.writeBuffer[1][3] = (byte)(yposABS >> 8);
-                    this.writeBuffer[1][4] = (byte)(yposDecSigned & 255);
-                    this.writeBuffer[1][5] = (byte)(yposDecSigned >> 8);
-                    this.writeBuffer[1][6] = (byte)(zposABS & 255);
-                    this.writeBuffer[1][7] = (byte)(zposABS >> 8);
-
-                    // For the third packet
-                    this.writeBuffer[2][1] = (byte)(zposDecSigned & 255);
-                    this.writeBuffer[2][2] = (byte)(zposDecSigned >> 8);
-                }
-
-                // Write the packets
-                this.usb.SendData(this.writeBuffer);
-            } catch (Exception ex) { MessageBox.Show("UCCNCplugin.SendDisplayData Error.ToString(): '" + ex.ToString() + "'."); } }
-
-        public void CheckDevicePresent(bool throwMessage) { // throwMessage
-            try {
-                this.usb.ProductId = 60307;
-                this.usb.VendorId = 4302;
-                this.usb.CheckDevicePresent(throwMessage);
-            } catch (Exception ex) {MessageBox.Show("UCCNCplugin.CheckDevicePresent Error.ToString(): '" + ex.ToString() + "'."); }  }
-        public void CheckDevicePresent() { this.CheckDevicePresent(false); }
+            return returnValue; }
 
         public double GetUCmpgSpeed() {
             if (this.UC.GetLED(148)) { return 0.1; }
@@ -404,40 +270,48 @@ namespace Plugins {
             if (labelNumber > 5) { labelNumber = 5; }
             labelNumber = 8 + labelNumber * 15;
             return 1.0 / this.UC.Getfielddouble(true, labelNumber); }
+        #endregion
 
         public void ActuatePendantCommands() {
             // Axis selection
+            // 155 // MPGXaxisselect // On when the X axis is selected for the MPG jog.
             if (this.selectedAxis == 1 && !this.UC.GetLED(155)) {
-                this.UC.Callbutton(220);
-            } else if (this.selectedAxis == 2 && !this.UC.GetLED(156)) {
-                this.UC.Callbutton(221);
-            } else if (this.selectedAxis == 3 && !this.UC.GetLED(157)) {
-                this.UC.Callbutton(222);
-            } else if (this.selectedAxis == 4 && !this.UC.GetLED(158)) {
-                this.UC.Callbutton(223);
-            } else if (this.selectedAxis == 5 && !this.UC.GetLED(159)) {
-                this.UC.Callbutton(224);
-            } else if (this.selectedAxis == 6 && !this.UC.GetLED(160)) { this.UC.Callbutton(225); }
+                // 220 // MPGXaxisselect // Selects the X axis for the MPG jog.
+                this.UC.Callbutton(220); }
+            // 156 // MPGYaxisselect // On when the Y axis is selected for the MPG jog.
+            if (this.selectedAxis == 2 && !this.UC.GetLED(156)) {
+                // 221 // MPGYaxisselect // Selects the Y axis for the MPG jog.
+                this.UC.Callbutton(221); } 
+            if (this.selectedAxis == 3 && !this.UC.GetLED(157)) {  this.UC.Callbutton(222); } 
+            if (this.selectedAxis == 4 && !this.UC.GetLED(158)) { this.UC.Callbutton(223); } 
+            if (this.selectedAxis == 5 && !this.UC.GetLED(159)) { this.UC.Callbutton(224); } 
+            if (this.selectedAxis == 6 && !this.UC.GetLED(160)) { this.UC.Callbutton(225); }
 
             // Reset state
-            if (!this.buttonRegister02.Reset && this.buttonRegister01.Reset) { this.UC.Callbutton(144); }
+            if (!this.oldButtonRegister.Reset && this.buttonRegister.Reset) {
+                // 144 // Resettoggle // Toggles the reset button.
+                this.UC.Callbutton(144); }
 
             // Call Stop
-            if (!this.buttonRegister02.Stop && this.buttonRegister01.Stop) { this.UC.Callbutton(130); }
+            if (!this.oldButtonRegister.Stop && this.buttonRegister.Stop) {
+                // 130 // Cyclestop // Stops the G-code execution.
+                this.UC.Callbutton(130); }
 
             // Call Home
-            if (!this.buttonRegister02.Home && this.buttonRegister01.Home) { this.UC.Callbutton(113); }
+            if (!this.oldButtonRegister.Home && this.buttonRegister.Home) {
+                // 113 // HomeAll // Runs all axis to the home sensor. The homing sequence is defined in the setup.
+                this.UC.Callbutton(113); }
 
             // Call a Feed Modifier Change
-            if (!this.buttonRegister02.FeedPlus && this.buttonRegister01.FeedPlus) { this.UC.Callbutton(132); }
-            if (!this.buttonRegister02.FeedMinus && this.buttonRegister01.FeedMinus) { this.UC.Callbutton(133); }
+            if (!this.oldButtonRegister.FeedPlus && this.buttonRegister.FeedPlus) { this.UC.Callbutton(132); }
+            if (!this.oldButtonRegister.FeedMinus && this.buttonRegister.FeedMinus) { this.UC.Callbutton(133); }
 
             // Call a Spindle Speed Modifier change
-            if (!this.buttonRegister02.SpindlePlus && this.buttonRegister01.SpindlePlus) { this.UC.Callbutton(134); }
-            if (!this.buttonRegister02.SpindleMinus && this.buttonRegister01.SpindleMinus) { this.UC.Callbutton(135); }
+            if (!this.oldButtonRegister.SpindlePlus && this.buttonRegister.SpindlePlus) { this.UC.Callbutton(134); }
+            if (!this.oldButtonRegister.SpindleMinus && this.buttonRegister.SpindleMinus) { this.UC.Callbutton(135); }
 
             // Call the Start/Pause behaviour
-            if (!this.buttonRegister02.StartPause && this.buttonRegister01.StartPause) {
+            if (!this.oldButtonRegister.StartPause && this.buttonRegister.StartPause) {
                 // Check if idle, and call the cycle start
                 if (this.UC.GetLED(18)) {
                     this.UC.Callbutton(128);
@@ -449,10 +323,14 @@ namespace Plugins {
                     this.UC.Callbutton(523); } }
 
             // Call the probe Z button...   Toollengthmeasurement...  maybe replace with a macro to be safe
-            if (!this.buttonRegister02.ProbeZ && this.buttonRegister01.ProbeZ) { this.UC.Callbutton(196); }
+            if (!this.oldButtonRegister.ProbeZ && this.buttonRegister.ProbeZ) {
+                // 196 // Toollengthmeasurement // Commands a tool length measurement. (Code executed in Macro M31)
+                this.UC.Callbutton(196); }
 
             // Turn the spindle off or on, M3toggle
-            if (!this.buttonRegister02.Spindle && this.buttonRegister01.Spindle) { this.UC.Callbutton(114); }
+            if (!this.oldButtonRegister.Spindle && this.buttonRegister.Spindle) {
+                // 114 // M3toggle // Toggles the M3 spindle CW button.
+                this.UC.Callbutton(114); }
 
             // if no buttons and the idle indicator is on, Idle....    zero the fucking axis'??   WHOT THE FUCK???
             /*if (!this.buttonRegister02.Null && this.buttonRegister01.Null && this.UC.GetLED(18)) {
@@ -464,7 +342,7 @@ namespace Plugins {
 				if (this.pendant.selectedAxis == 6 && this.UC.GetLED(160)) { this.UC.Callbutton(105); } } //*/
 
             // Do a safe Z call...   so "G0Z" + this.UC.Getfield(true, 225)
-            if (!this.buttonRegister02.SafeZ && this.buttonRegister01.SafeZ && this.UC.GetLED(18)) {
+            if (!this.oldButtonRegister.SafeZ && this.buttonRegister.SafeZ && this.UC.GetLED(18)) {
                 //this.UC.Code("G0Z" + this.UC.Getfield(true, 225));
                 // Call the safe Z button 216
                 this.UC.Callbutton(216);  }
@@ -473,7 +351,7 @@ namespace Plugins {
             //if (!this.buttonRegister02.GotoZero && this.buttonRegister01.GotoZero) { this.UC.Callbutton(131); }
 
             // On a step mode toggling
-            if (!this.buttonRegister02.StepMode && this.buttonRegister01.StepMode) {
+            if (!this.oldButtonRegister.StepMode && this.buttonRegister.StepMode) {
                 // if not MPGmodecont or MPGmodesingle or MPGmodemulti, then MPGcontmodeselect
                 if (!this.UC.GetLED(152) && !this.UC.GetLED(153) && !this.UC.GetLED(154)) {
                     this.UC.Callbutton(226);
@@ -490,68 +368,68 @@ namespace Plugins {
                 this.ContinuousMode = false; }
 
             // Call continuous mode
-            if (!this.buttonRegister02.ContinuousMode && this.buttonRegister01.ContinuousMode) {
+            if (!this.oldButtonRegister.ContinuousMode && this.buttonRegister.ContinuousMode) {
                 // Call Jogmodecont...   inconsistent with MPG mode stuff elsewhere etc...   wtf?
                 this.UC.Callbutton(161);
                 this.keyTime = 3;
                 this.ContinuousMode = true; }
 
             // Call a macro
-            if (!this.buttonRegister02.Macro1 && this.buttonRegister01.Macro1) {
+            if (!this.oldButtonRegister.Macro1 && this.buttonRegister.Macro1) {
                 if (!this.PF.FunctionOrMacros(1)) {
                     if (this.PF.FunctiondescriptionComboboxes(1).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(1).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(1)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro2 && this.buttonRegister01.Macro2) {
+            if (!this.oldButtonRegister.Macro2 && this.buttonRegister.Macro2) {
                 if (!this.PF.FunctionOrMacros(2)) {
                     if (this.PF.FunctiondescriptionComboboxes(2).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(2).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(2)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro3 && this.buttonRegister01.Macro3) {
+            if (!this.oldButtonRegister.Macro3 && this.buttonRegister.Macro3) {
                 if (!this.PF.FunctionOrMacros(3)) {
                     if (this.PF.FunctiondescriptionComboboxes(3).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(3).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(3)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro4 && this.buttonRegister01.Macro4) {
+            if (!this.oldButtonRegister.Macro4 && this.buttonRegister.Macro4) {
                 if (!this.PF.FunctionOrMacros(4)) {
                     if (this.PF.FunctiondescriptionComboboxes(4).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(4).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(4)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro5 && this.buttonRegister01.Macro5) {
+            if (!this.oldButtonRegister.Macro5 && this.buttonRegister.Macro5) {
                 if (!this.PF.FunctionOrMacros(5)) {
                     if (this.PF.FunctiondescriptionComboboxes(5).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(5).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(5)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro6 && this.buttonRegister01.Macro6) {
+            if (!this.oldButtonRegister.Macro6 && this.buttonRegister.Macro6) {
                 if (!this.PF.FunctionOrMacros(6)) {
                     if (this.PF.FunctiondescriptionComboboxes(6).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(6).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(6)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro7 && this.buttonRegister01.Macro7) {
+            if (!this.oldButtonRegister.Macro7 && this.buttonRegister.Macro7) {
                 if (!this.PF.FunctionOrMacros(7)) {
                     if (this.PF.FunctiondescriptionComboboxes(7).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(7).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(7)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro8 && this.buttonRegister01.Macro8) {
+            if (!this.oldButtonRegister.Macro8 && this.buttonRegister.Macro8) {
                 if (!this.PF.FunctionOrMacros(8)) {
                     if (this.PF.FunctiondescriptionComboboxes(8).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(8).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(8)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro9 && this.buttonRegister01.Macro9) {
+            if (!this.oldButtonRegister.Macro9 && this.buttonRegister.Macro9) {
                 if (!this.PF.FunctionOrMacros(9)) {
                     if (this.PF.FunctiondescriptionComboboxes(9).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(9).SelectedIndex]); }
                 } else { try { this.UC.Code(this.PF.MacroCodeNoTextBoxes(9)); } catch { } } }
 
-            if (!this.buttonRegister02.Macro10 && this.buttonRegister01.Macro10) {
+            if (!this.oldButtonRegister.Macro10 && this.buttonRegister.Macro10) {
                 if (!this.PF.FunctionOrMacros(10)) {
                     if (this.PF.FunctiondescriptionComboboxes(10).Items.Count == this.functionCodes.Length) {
                         this.UC.Callbutton(this.functionCodes[this.PF.FunctiondescriptionComboboxes(10).SelectedIndex]); return; }
@@ -684,10 +562,90 @@ namespace Plugins {
                 this.UC.Writekey("AshLabPlugin", "MPGSpeedMultiplier", this.mpgSpeedMultiplier.ToString());
             } catch (Exception ex) { MessageBox.Show("UCCNCplugin.SaveParam - - Error.ToString(): '" + ex.ToString() + "'."); throw ex; } }
 
+        private void MPGcontinuousMode() {
+            // Check if in MPG continuous mode // MPGmodecont // On when the MPG continous mode is selected.
+            if (this.UC.GetLED(152)) {
+                this.mpg = this.__nlHbpVvlo6 - this.__Y1JbMv8qwH;
+                this.__tmAbybR6so++;
+                if (this.__tmAbybR6so >= this.mpgFilter || this.__tmAbybR6so > 25) { this.__tmAbybR6so = 0; }
+                this.__LcabRmTEUe[this.__tmAbybR6so] = this.mpg;
+                if (this.mpgFilter > 1) {
+                    this.__oWcbuNLLed = 0;
+                    for (int num2 = 0; num2 < this.mpgFilter; num2++) { this.__oWcbuNLLed += this.__LcabRmTEUe[num2]; }
+                    this.__t8BbhdSDhT = (double)this.__oWcbuNLLed / (double)this.mpgFilter;
+                } else { this.__t8BbhdSDhT = (double)this.__LcabRmTEUe[0]; }
+
+                this.jogSpeed = this.__t8BbhdSDhT * this.mpgSpeedMultiplier;
+                this.jogSpeed = this.jogSpeed * this.GetUCmpgSpeed() / 100.0;
+                if (this.jogSpeed > 100.0) { this.jogSpeed = 100.0; }
+                if (this.jogSpeed < -100.0) { this.jogSpeed = -100.0; }
+
+                bool flag;
+                if (this.jogSpeed < 0.0) {
+                    this.jogSpeed = Math.Abs(this.jogSpeed);
+                    flag = false;
+                } else { flag = true; }
+
+                switch (this.axisIndex) {
+                    case 0:
+                        this.UC.JogOnSpeed(0, flag, this.jogSpeed);
+                        this.UC.JogOnSpeed(1, false, 0.0);
+                        this.UC.JogOnSpeed(2, false, 0.0);
+                        this.UC.JogOnSpeed(3, false, 0.0);
+                        this.UC.JogOnSpeed(4, false, 0.0);
+                        this.UC.JogOnSpeed(5, false, 0.0);
+                        break;
+                    case 1:
+                        this.UC.JogOnSpeed(0, false, 0.0);
+                        this.UC.JogOnSpeed(1, flag, this.jogSpeed);
+                        this.UC.JogOnSpeed(2, false, 0.0);
+                        this.UC.JogOnSpeed(3, false, 0.0);
+                        this.UC.JogOnSpeed(4, false, 0.0);
+                        this.UC.JogOnSpeed(5, false, 0.0);
+                        break;
+                    case 2:
+                        this.UC.JogOnSpeed(0, false, 0.0);
+                        this.UC.JogOnSpeed(1, false, 0.0);
+                        this.UC.JogOnSpeed(2, flag, this.jogSpeed);
+                        this.UC.JogOnSpeed(3, false, 0.0);
+                        this.UC.JogOnSpeed(4, false, 0.0);
+                        this.UC.JogOnSpeed(5, false, 0.0);
+                        break;
+                    case 3:
+                        this.UC.JogOnSpeed(0, false, 0.0);
+                        this.UC.JogOnSpeed(1, false, 0.0);
+                        this.UC.JogOnSpeed(2, false, 0.0);
+                        this.UC.JogOnSpeed(3, flag, this.jogSpeed);
+                        this.UC.JogOnSpeed(4, false, 0.0);
+                        this.UC.JogOnSpeed(5, false, 0.0);
+                        break;
+                    case 4:
+                        this.UC.JogOnSpeed(0, false, 0.0);
+                        this.UC.JogOnSpeed(1, false, 0.0);
+                        this.UC.JogOnSpeed(2, false, 0.0);
+                        this.UC.JogOnSpeed(3, false, 0.0);
+                        this.UC.JogOnSpeed(4, flag, this.jogSpeed);
+                        this.UC.JogOnSpeed(5, false, 0.0);
+                        break;
+                    case 5:
+                        this.UC.JogOnSpeed(0, false, 0.0);
+                        this.UC.JogOnSpeed(1, false, 0.0);
+                        this.UC.JogOnSpeed(2, false, 0.0);
+                        this.UC.JogOnSpeed(3, false, 0.0);
+                        this.UC.JogOnSpeed(4, false, 0.0);
+                        this.UC.JogOnSpeed(5, flag, this.jogSpeed);
+                        break;
+                }
+            }
+        }
+
         public void MPGevent() {
+            // 236 // MPGJogOn // Indicates that the MPG jogging is active.
             if (this.keyTime == 1 || this.UC.GetLED(236)) { this.UC.MPGJogOff(0); }
             if (this.keyTime != 0) { this.keyTime--; }
-            if (this.selectedAxis == 1 || this.selectedAxis == 2 || this.selectedAxis == 3 || this.selectedAxis == 4 || this.selectedAxis == 5 || this.selectedAxis == 6) {
+
+            // Check for a validly selected axis
+            if (this.selectedAxis >= 1 && this.selectedAxis <= 6) {
                 //int num = 0;
                 if (this.UC.GetLED(155)) { this.axisIndex = 0; }
                 if (this.UC.GetLED(156)) { this.axisIndex = 1; }
@@ -696,80 +654,10 @@ namespace Plugins {
                 if (this.UC.GetLED(159)) { this.axisIndex = 4; }
                 if (this.UC.GetLED(160)) { this.axisIndex = 5; }
 
-                // Check if in MPG continuous mode
-                if (this.UC.GetLED(152)) {
-                    this.mpg = this.__nlHbpVvlo6 - this.__Y1JbMv8qwH;
-                    this.__tmAbybR6so++;
-                    if (this.__tmAbybR6so >= this.mpgFilter || this.__tmAbybR6so > 25) { this.__tmAbybR6so = 0; }
-                    this.__LcabRmTEUe[this.__tmAbybR6so] = this.mpg;
-                    if (this.mpgFilter > 1) {
-                        this.__oWcbuNLLed = 0;
-                        for (int num2 = 0; num2 < this.mpgFilter; num2++) { this.__oWcbuNLLed += this.__LcabRmTEUe[num2]; }
-                        this.__t8BbhdSDhT = (double)this.__oWcbuNLLed / (double)this.mpgFilter;
-                    } else { this.__t8BbhdSDhT = (double)this.__LcabRmTEUe[0]; }
+                // Check if in MPG continuous mode // MPGmodecont // On when the MPG continous mode is selected.
+                this.MPGcontinuousMode();
 
-                    this.__fkwbfUPG3J = this.__t8BbhdSDhT * this.mpgSpeedMultiplier;
-                    this.__fkwbfUPG3J = this.__fkwbfUPG3J * this.GetUCmpgSpeed() / 100.0;
-                    if (this.__fkwbfUPG3J > 100.0) { this.__fkwbfUPG3J = 100.0; }
-                    if (this.__fkwbfUPG3J < -100.0) { this.__fkwbfUPG3J = -100.0; }
-
-                    bool flag;
-                    if (this.__fkwbfUPG3J < 0.0) {
-                        this.__fkwbfUPG3J = Math.Abs(this.__fkwbfUPG3J);
-                        flag = false;
-                    } else { flag = true; }
-
-                    switch (this.axisIndex) {
-                        case 0:
-                            this.UC.JogOnSpeed(0, flag, this.__fkwbfUPG3J);
-                            this.UC.JogOnSpeed(1, false, 0.0);
-                            this.UC.JogOnSpeed(2, false, 0.0);
-                            this.UC.JogOnSpeed(3, false, 0.0);
-                            this.UC.JogOnSpeed(4, false, 0.0);
-                            this.UC.JogOnSpeed(5, false, 0.0);
-                            break;
-                        case 1:
-                            this.UC.JogOnSpeed(0, false, 0.0);
-                            this.UC.JogOnSpeed(1, flag, this.__fkwbfUPG3J);
-                            this.UC.JogOnSpeed(2, false, 0.0);
-                            this.UC.JogOnSpeed(3, false, 0.0);
-                            this.UC.JogOnSpeed(4, false, 0.0);
-                            this.UC.JogOnSpeed(5, false, 0.0);
-                            break;
-                        case 2:
-                            this.UC.JogOnSpeed(0, false, 0.0);
-                            this.UC.JogOnSpeed(1, false, 0.0);
-                            this.UC.JogOnSpeed(2, flag, this.__fkwbfUPG3J);
-                            this.UC.JogOnSpeed(3, false, 0.0);
-                            this.UC.JogOnSpeed(4, false, 0.0);
-                            this.UC.JogOnSpeed(5, false, 0.0);
-                            break;
-                        case 3:
-                            this.UC.JogOnSpeed(0, false, 0.0);
-                            this.UC.JogOnSpeed(1, false, 0.0);
-                            this.UC.JogOnSpeed(2, false, 0.0);
-                            this.UC.JogOnSpeed(3, flag, this.__fkwbfUPG3J);
-                            this.UC.JogOnSpeed(4, false, 0.0);
-                            this.UC.JogOnSpeed(5, false, 0.0);
-                            break;
-                        case 4:
-                            this.UC.JogOnSpeed(0, false, 0.0);
-                            this.UC.JogOnSpeed(1, false, 0.0);
-                            this.UC.JogOnSpeed(2, false, 0.0);
-                            this.UC.JogOnSpeed(3, false, 0.0);
-                            this.UC.JogOnSpeed(4, flag, this.__fkwbfUPG3J);
-                            this.UC.JogOnSpeed(5, false, 0.0);
-                            break;
-                        case 5:
-                            this.UC.JogOnSpeed(0, false, 0.0);
-                            this.UC.JogOnSpeed(1, false, 0.0);
-                            this.UC.JogOnSpeed(2, false, 0.0);
-                            this.UC.JogOnSpeed(3, false, 0.0);
-                            this.UC.JogOnSpeed(4, false, 0.0);
-                            this.UC.JogOnSpeed(5, flag, this.__fkwbfUPG3J);
-                            break;
-                    }
-                }
+                // Check if in MPG single step mode // MPGmodesingle // On when the MPG single mode is selected.
                 if (this.UC.GetLED(153)) {
                     this.mpg = this.__nlHbpVvlo6 - this.__Y1JbMv8qwH;
                     if (this.mpg > 0) { this.mpg = 1; }
@@ -789,6 +677,8 @@ namespace Plugins {
                     }
                     if (this.mpg != 0) { this.__bq3b8ROAwH = 9; }
                 }
+
+                // Check if in MPG multi step mode // MPGmodemulti // On when the MPG multi mode is selected.
                 if (this.UC.GetLED(154)) {
                     this.mpg = this.__nlHbpVvlo6 - this.__Y1JbMv8qwH;
                     this.mpgSumma += (double)this.mpg * this.GetUCjogRate();
@@ -810,32 +700,18 @@ namespace Plugins {
             }
             this.__nlHbpVvlo6 = this.__Y1JbMv8qwH; }
 
-        private void USBspecifiedDeviceArrived(object sender, global::System.EventArgs args) {
+        #region Handler Subs
+        public void USBspecifiedDeviceArrived() {
             this.PF.USBconnectionStatus = "Device connected!"; }
 
-        private void USBspecifiedDeviceRemoved(object sender, global::System.EventArgs args) {
-            if (!this.PF.Parent.InvokeRequired) {
-                this.PF.USBconnectionStatus = "Device not found?";
-                return; }
-            object[] args2 = new object[] { sender, args };
-            this.PF.Parent.Invoke(new global::System.EventHandler(this.USBspecifiedDeviceRemoved), args2); }
+        public void USBspecifiedDeviceRemoved() {
+            this.PF.USBconnectionStatus = "Device not found?"; }
 
-        private void USBdeviceArrived(object sender, global::System.EventArgs args) { }
-        private void USBdeviceRemoved(object sender, global::System.EventArgs args) {
-            if (this.PF.Parent.InvokeRequired) {
-                object[] args2 = new object[] { sender, args };
-                this.PF.Parent.Invoke(new global::System.EventHandler(this.USBdeviceRemoved), args2); } }
+        public void USBdeviceArrived() { }
+        public void USBdeviceRemoved() { }
 
-        public void DataRecieved(object sender, global::UsbLibrary.DataRecievedEventArgs args) {
-            if (this.PF.Parent.InvokeRequired) {
-                try {
-                    this.PF.Parent.Invoke(new global::UsbLibrary.DataRecievedEventHandler(this.DataRecieved), new object[] { sender, args });
-                    return;
-                } catch (global::System.Exception ex) {
-                    global::System.Console.WriteLine(ex.ToString());
-                    return; } }
-
-            if (args.data[0] == 4 && args.data[2] == 0 && args.data[3] == 0 && args.data[4] == 0 && args.data[5] == 0 && args.data[6] == 0) {
+        public void DataRecieved(byte[] data) { 
+            if (data[0] == 4 && data[2] == 0 && data[3] == 0 && data[4] == 0 && data[5] == 0 && data[6] == 0) {
                 this.UC.JogOnSpeed(0, false, 0.0);
                 this.UC.JogOnSpeed(1, false, 0.0);
                 this.UC.JogOnSpeed(2, false, 0.0);
@@ -844,28 +720,29 @@ namespace Plugins {
                 this.UC.JogOnSpeed(5, false, 0.0);
                 return; }
 
-            if (args.data[6] != 0) {
-                byte b = args.data[6];
+            if (data[6] != 0) {
+                byte b = data[6];
                 if (b < 128) { this.__Y1JbMv8qwH += (int)b;
                 } else { this.__Y1JbMv8qwH -= 256 - (int)b; } }
 
-            if (args.data[5] != 6) {
-                switch (args.data[5]) {
+            if (data[5] != 6) {
+                switch (data[5]) {
                     case 17: this.selectedAxis = 1; break;
                     case 18: this.selectedAxis = 2; break;
                     case 19: this.selectedAxis = 3; break;
                     case 20: this.selectedAxis = 4; break;
                     case 21: this.selectedAxis = 5; break;
-                    case 22: this.selectedAxis = 6; break; }
+                    case 22: this.selectedAxis = 6; break;
+                }
             } else { this.selectedAxis = 0; }
 
             int buttonNumber = 0;
-            if (args.data[4] == 13) { this.jogfeedrate = 2.0; buttonNumber = 241; }
-            if (args.data[4] == 14) { this.jogfeedrate = 5.0; buttonNumber = 164; }
-            if (args.data[4] == 15) { this.jogfeedrate = 10.0; buttonNumber = 165; }
-            if (args.data[4] == 16) { this.jogfeedrate = 30.0; buttonNumber = 166; }
-            if (args.data[4] == 26) { this.jogfeedrate = 60.0; }
-            if (args.data[4] == 27) { this.jogfeedrate = 100.0; }
+            if (data[4] == 13) { this.jogfeedrate = 2.0; buttonNumber = 241; }
+            if (data[4] == 14) { this.jogfeedrate = 5.0; buttonNumber = 164; }
+            if (data[4] == 15) { this.jogfeedrate = 10.0; buttonNumber = 165; }
+            if (data[4] == 16) { this.jogfeedrate = 30.0; buttonNumber = 166; }
+            if (data[4] == 26) { this.jogfeedrate = 60.0; }
+            if (data[4] == 27) { this.jogfeedrate = 100.0; }
 
             this.keyTime = 3;
             if (this.ContinuousMode) {
@@ -873,69 +750,75 @@ namespace Plugins {
                     this.UC.Setfield(false, this.jogfeedrate, 913);
                     this.UC.Validatefield(false, 913);
                     this.UC.Setfield(true, this.jogfeedrate, 913);
-                    this.UC.Validatefield(true, 913); }
+                    this.UC.Validatefield(true, 913);
+                }
             } else if (buttonNumber != 0 && buttonNumber != this.lastButtonIndex) {
                 this.UC.Callbutton(buttonNumber);
-                this.lastButtonIndex = buttonNumber; }
+                this.lastButtonIndex = buttonNumber;
+            }
 
-            if (args.data[2] != 0 || args.data[3] != 0) {
-                byte b2 = args.data[2];
-                byte b3 = args.data[3];
-                this.buttonRegister02 = this.buttonRegister01;
-                if (b2 == 1) { this.buttonRegister01.Reset = true; } else { this.buttonRegister01.Reset = false; }
-                if (b2 == 2) { this.buttonRegister01.Stop = true; } else { this.buttonRegister01.Stop = false; }
-                if (b2 == 3) { this.buttonRegister01.StartPause = true; } else { this.buttonRegister01.StartPause = false; }
+            if (data[2] != 0 || data[3] != 0) {
+                byte b2 = data[2];
+                byte b3 = data[3];
+                this.oldButtonRegister = this.buttonRegister;
+                if (b2 == 1) { this.buttonRegister.Reset = true; } else { this.buttonRegister.Reset = false; }
+                if (b2 == 2) { this.buttonRegister.Stop = true; } else { this.buttonRegister.Stop = false; }
+                if (b2 == 3) { this.buttonRegister.StartPause = true; } else { this.buttonRegister.StartPause = false; }
 
                 if (b2 == 12) {
-                    if (b3 == 10) { this.buttonRegister01.GotoZero = true; } else { this.buttonRegister01.GotoZero = false; }
-                    if (b3 == 13) { this.buttonRegister01.ProbeZ = true; } else { this.buttonRegister01.ProbeZ = false; }
-                    if (b3 == 11) { this.buttonRegister01.Spindle = true; } else { this.buttonRegister01.Spindle = false; }
-                    if (b3 == 9) { this.buttonRegister01.SafeZ = true; } else { this.buttonRegister01.SafeZ = false; }
-                    if (b3 == 8) { this.buttonRegister01.Home = true; } else { this.buttonRegister01.Home = false; }
-                    if (b3 == 4) { this.buttonRegister01.FeedPlus = true; } else { this.buttonRegister01.FeedPlus = false; }
-                    if (b3 == 5) { this.buttonRegister01.FeedMinus = true; } else { this.buttonRegister01.FeedMinus = false; }
-                    if (b3 == 6) { this.buttonRegister01.SpindlePlus = true; } else { this.buttonRegister01.SpindlePlus = false; }
-                    if (b3 == 7) { this.buttonRegister01.SpindleMinus = true; } else { this.buttonRegister01.SpindleMinus = false; } }
-                if (b2 == 4) { this.buttonRegister01.Macro1 = true; } else { this.buttonRegister01.Macro1 = false; }
-                if (b2 == 5) { this.buttonRegister01.Macro2 = true; } else { this.buttonRegister01.Macro2 = false; }
-                if (b2 == 6) { this.buttonRegister01.Macro3 = true; } else { this.buttonRegister01.Macro3 = false; }
-                if (b2 == 7) { this.buttonRegister01.Macro4 = true; } else { this.buttonRegister01.Macro4 = false; }
-                if (b2 == 8) { this.buttonRegister01.Macro5 = true; } else { this.buttonRegister01.Macro5 = false; }
-                if (b2 == 9) { this.buttonRegister01.Macro6 = true; } else { this.buttonRegister01.Macro6 = false; }
-                if (b2 == 10) { this.buttonRegister01.Macro7 = true; } else { this.buttonRegister01.Macro7 = false; }
-                if (b2 == 11) { this.buttonRegister01.Macro8 = true; } else { this.buttonRegister01.Macro8 = false; }
-                if (b2 == 13) { this.buttonRegister01.Macro9 = true; } else { this.buttonRegister01.Macro9 = false; }
+                    if (b3 == 10) { this.buttonRegister.GotoZero = true; } else { this.buttonRegister.GotoZero = false; }
+                    if (b3 == 13) { this.buttonRegister.ProbeZ = true; } else { this.buttonRegister.ProbeZ = false; }
+                    if (b3 == 11) { this.buttonRegister.Spindle = true; } else { this.buttonRegister.Spindle = false; }
+                    if (b3 == 9) { this.buttonRegister.SafeZ = true; } else { this.buttonRegister.SafeZ = false; }
+                    if (b3 == 8) { this.buttonRegister.Home = true; } else { this.buttonRegister.Home = false; }
+                    if (b3 == 4) { this.buttonRegister.FeedPlus = true; } else { this.buttonRegister.FeedPlus = false; }
+                    if (b3 == 5) { this.buttonRegister.FeedMinus = true; } else { this.buttonRegister.FeedMinus = false; }
+                    if (b3 == 6) { this.buttonRegister.SpindlePlus = true; } else { this.buttonRegister.SpindlePlus = false; }
+                    if (b3 == 7) { this.buttonRegister.SpindleMinus = true; } else { this.buttonRegister.SpindleMinus = false; }
+                }
+                if (b2 == 4) { this.buttonRegister.Macro1 = true; } else { this.buttonRegister.Macro1 = false; }
+                if (b2 == 5) { this.buttonRegister.Macro2 = true; } else { this.buttonRegister.Macro2 = false; }
+                if (b2 == 6) { this.buttonRegister.Macro3 = true; } else { this.buttonRegister.Macro3 = false; }
+                if (b2 == 7) { this.buttonRegister.Macro4 = true; } else { this.buttonRegister.Macro4 = false; }
+                if (b2 == 8) { this.buttonRegister.Macro5 = true; } else { this.buttonRegister.Macro5 = false; }
+                if (b2 == 9) { this.buttonRegister.Macro6 = true; } else { this.buttonRegister.Macro6 = false; }
+                if (b2 == 10) { this.buttonRegister.Macro7 = true; } else { this.buttonRegister.Macro7 = false; }
+                if (b2 == 11) { this.buttonRegister.Macro8 = true; } else { this.buttonRegister.Macro8 = false; }
+                if (b2 == 13) { this.buttonRegister.Macro9 = true; } else { this.buttonRegister.Macro9 = false; }
 
-                if (b2 == 16) { this.buttonRegister01.Macro10 = true; } else { this.buttonRegister01.Macro10 = false; }
-                if (b2 == 15) { this.buttonRegister01.StepMode = true; } else { this.buttonRegister01.StepMode = false; }
-                if (b2 == 14) { this.buttonRegister01.ContinuousMode = true; } else { this.buttonRegister01.ContinuousMode = false; }
+                if (b2 == 16) { this.buttonRegister.Macro10 = true; } else { this.buttonRegister.Macro10 = false; }
+                if (b2 == 15) { this.buttonRegister.StepMode = true; } else { this.buttonRegister.StepMode = false; }
+                if (b2 == 14) { this.buttonRegister.ContinuousMode = true; } else { this.buttonRegister.ContinuousMode = false; }
             } else {
-                this.buttonRegister01.GotoZero = false;
-                this.buttonRegister01.Home = false;
-                this.buttonRegister01.Macro1 = false;
-                this.buttonRegister01.Macro2 = false;
-                this.buttonRegister01.Macro3 = false;
-                this.buttonRegister01.Macro4 = false;
-                this.buttonRegister01.Macro5 = false;
-                this.buttonRegister01.Macro6 = false;
-                this.buttonRegister01.Macro7 = false;
-                this.buttonRegister01.Macro8 = false;
-                this.buttonRegister01.Macro9 = false;
-                this.buttonRegister01.Macro10 = false;
-                this.buttonRegister01.ContinuousMode = false;
-                this.buttonRegister01.Null = false;
-                this.buttonRegister01.ProbeZ = false;
-                this.buttonRegister01.Reset = false;
-                this.buttonRegister01.SafeZ = false;
-                this.buttonRegister01.Spindle = false;
-                this.buttonRegister01.StartPause = false;
-                this.buttonRegister01.StepMode = false;
-                this.buttonRegister01.Stop = false;
-                this.buttonRegister01.FeedPlus = false;
-                this.buttonRegister01.FeedMinus = false;
-                this.buttonRegister01.SpindlePlus = false;
-                this.buttonRegister01.SpindleMinus = false; }
-            this.ActuatePendantCommands(); }
+                this.buttonRegister.GotoZero = false;
+                this.buttonRegister.Home = false;
+                this.buttonRegister.Macro1 = false;
+                this.buttonRegister.Macro2 = false;
+                this.buttonRegister.Macro3 = false;
+                this.buttonRegister.Macro4 = false;
+                this.buttonRegister.Macro5 = false;
+                this.buttonRegister.Macro6 = false;
+                this.buttonRegister.Macro7 = false;
+                this.buttonRegister.Macro8 = false;
+                this.buttonRegister.Macro9 = false;
+                this.buttonRegister.Macro10 = false;
+                this.buttonRegister.ContinuousMode = false;
+                this.buttonRegister.Null = false;
+                this.buttonRegister.ProbeZ = false;
+                this.buttonRegister.Reset = false;
+                this.buttonRegister.SafeZ = false;
+                this.buttonRegister.Spindle = false;
+                this.buttonRegister.StartPause = false;
+                this.buttonRegister.StepMode = false;
+                this.buttonRegister.Stop = false;
+                this.buttonRegister.FeedPlus = false;
+                this.buttonRegister.FeedMinus = false;
+                this.buttonRegister.SpindlePlus = false;
+                this.buttonRegister.SpindleMinus = false;
+            }
+            this.ActuatePendantCommands();
+        }
+        #endregion
 
         public void SetButtonRegister(byte byte01, byte byte02) { }
     }

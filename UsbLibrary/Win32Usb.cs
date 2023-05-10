@@ -127,9 +127,9 @@ namespace UsbLibrary {
 		/// <summary>Infinite timeout</summary>
 		protected const uint INFINITE = uint.MaxValue; //protected const uint INFINITE = 0xFFFFFFFF;
 		/// <summary>Simple representation of a null handle : a closed stream will get this handle. Note it is public for comparison by higher level classes.</summary>
-		public static IntPtr NullHandle; //public static IntPtr NullHandle = IntPtr.Zero;
+		public static IntPtr NullHandle = global::System.IntPtr.Zero; //public static IntPtr NullHandle = IntPtr.Zero;
 		/// <summary>Simple representation of the handle returned when CreateFile fails.</summary>
-		protected static IntPtr InvalidHandleValue; //protected static IntPtr InvalidHandleValue = new IntPtr(-1);
+		protected static IntPtr InvalidHandleValue = new global::System.IntPtr(-1); //protected static IntPtr InvalidHandleValue = new IntPtr(-1);
 		#endregion
 
 		#region P/Invoke
@@ -257,7 +257,9 @@ namespace UsbLibrary {
 		/// <param name="lpTemplate">Not used</param>
 		/// <returns></returns>
 		[global::System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
-		protected static extern global::System.IntPtr CreateFile([global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPStr)] string strName, uint nAccess, uint nShareMode, global::System.IntPtr lpSecurity, uint nCreationFlags, uint nAttributes, global::System.IntPtr lpTemplate);
+		protected static extern global::System.IntPtr CreateFile(
+			[global::System.Runtime.InteropServices.MarshalAs(global::System.Runtime.InteropServices.UnmanagedType.LPStr)] string strName, 
+			uint nAccess, uint nShareMode, global::System.IntPtr lpSecurity, uint nCreationFlags, uint nAttributes, global::System.IntPtr lpTemplate);
 
 		/// <summary>
 		/// Closes a window handle. File handles, event handles, mutex handles... etc
@@ -316,9 +318,6 @@ namespace UsbLibrary {
 				return result; } }
 		#endregion
 
-		public Win32Usb() : base() { }
-		static Win32Usb() {
-			global::UsbLibrary.Win32Usb.NullHandle = global::System.IntPtr.Zero;
-			global::UsbLibrary.Win32Usb.InvalidHandleValue = new global::System.IntPtr(-1); }
+		//public Win32Usb() : base() { }
 	}
 }

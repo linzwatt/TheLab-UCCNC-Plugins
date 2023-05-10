@@ -79,6 +79,12 @@
     </Compile>
     <Compile Include="Plugins\UCCNCplugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Pendant\WHB4_04_Pendant.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Pendant\WHB4_04_Pendant.Designer.cs">
+      <DependentUpon>WHB4_04_Pendant.cs</DependentUpon>
+    </Compile>
     <Compile Include="UsbLibrary\DataRecievedEventArgs.cs" />
     <Compile Include="UsbLibrary\DataSendEventArgs.cs" />
     <Compile Include="UsbLibrary\HIDDevice.cs" />

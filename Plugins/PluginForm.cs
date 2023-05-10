@@ -7,11 +7,10 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 
-namespace Plugins
-{
+namespace Plugins {
     public partial class PluginForm : Form {
         private Plugininterface.Entry UC;
-        private UCCNCplugin pendant;
+        private UCCNCplugin main;
 
         private ComboBox[] _functiondescriptionComboboxes = null;
         private CheckBox[] _functionOrMacros = null;
@@ -19,13 +18,15 @@ namespace Plugins
 
         public PluginForm(UCCNCplugin Pluginmain) {
             this.UC = Pluginmain.UC;
-            this.pendant = Pluginmain;
+            this.main = Pluginmain;
             InitializeComponent();
+            // Setup the usb thingo
+            //this.pendant.usb = new global::UsbLibrary.UsbHidPort(this.Components);
         }
         public IContainer Components { get { return this.components; } }
         public string MPGspeedMultiplierTextBox { get { return this.mpgSpeedMultiplierTextBox.Text; } set { this.mpgSpeedMultiplierTextBox.Text = value; } }
         public string USBconnectionStatus { get { return this.usbConnectionStatus.Text; } set { this.usbConnectionStatus.Text = value; } }
-        public void SetMPGFilterFromCombobox() { this.mpgFilterCombobox.SelectedIndex = this.pendant.mpgFilter; }
+        public void SetMPGFilterFromCombobox() { this.mpgFilterCombobox.SelectedIndex = this.main.mpgFilter; }
 
         public ComboBox FunctiondescriptionComboboxes(int macroNumber, int selectedIndex = -1, object addItem = null) {
             try {
@@ -127,17 +128,17 @@ namespace Plugins
 
         private void PluginForm_Load(object sender, EventArgs e) { }
 
-        private void ShowForm(object input, EventArgs eventArgs) {
+        public void ShowForm(object input, EventArgs eventArgs) {
             base.Show();
             base.WindowState = FormWindowState.Normal;
             base.ShowInTaskbar = true; }
 
         protected override void OnHandleCreated(global::System.EventArgs e) {
             base.OnHandleCreated(e);
-            this.pendant.usb.RegisterHandle(base.Handle); }
+            this.main.pendant.RegisterHandle(base.Handle); }
 
         protected override void WndProc(ref global::System.Windows.Forms.Message m) {
-            this.pendant.usb.ParseMessages(ref m);
+            this.main.pendant.ParseMessages(ref m);
             base.WndProc(ref m); }
 
         private void PluginForm_FormClosing(object input, FormClosingEventArgs eventArgs) {
@@ -159,17 +160,151 @@ namespace Plugins
             this.Close();
         } // */
 
-        private void findDeviceButton_Click(object sender, EventArgs e) { this.pendant.CheckDevicePresent(true); }
+        private void findDeviceButton_Click(object sender, EventArgs e) { this.main.pendant.CheckDevicePresent(true); }
 
         private void SetMPGspeedMultiplierFromTextBox(object unUsed, KeyEventArgs keyEventArgs) {
             if (keyEventArgs.KeyData == Keys.Return) {
-                if (double.TryParse(this.MPGspeedMultiplierTextBox, out this.pendant.mpgSpeedMultiplier)) {
-                    if (this.pendant.mpgSpeedMultiplier < 0.01) { this.pendant.mpgSpeedMultiplier = 0.01; }
-                    if (this.pendant.mpgSpeedMultiplier > 25.0) { this.pendant.mpgSpeedMultiplier = 25.0; }
-                    this.MPGspeedMultiplierTextBox = this.pendant.mpgSpeedMultiplier.ToString();
+                if (double.TryParse(this.MPGspeedMultiplierTextBox, out this.main.mpgSpeedMultiplier)) {
+                    if (this.main.mpgSpeedMultiplier < 0.01) { this.main.mpgSpeedMultiplier = 0.01; }
+                    if (this.main.mpgSpeedMultiplier > 25.0) { this.main.mpgSpeedMultiplier = 25.0; }
+                    this.MPGspeedMultiplierTextBox = this.main.mpgSpeedMultiplier.ToString();
                     return; }
                 global::System.Windows.Forms.MessageBox.Show("Failed to set the MPG speed multiplier with what you put in the text box??");
-                this.MPGspeedMultiplierTextBox = this.pendant.mpgSpeedMultiplier.ToString(); } }
+                this.MPGspeedMultiplierTextBox = this.main.mpgSpeedMultiplier.ToString(); } }
 
+        #region Handlers
+        public void USBspecifiedDeviceArrived(object sender, global::System.EventArgs args) {
+            if (base.InvokeRequired) { 
+                try { base.Invoke(new global::System.EventHandler(this.USBspecifiedDeviceArrived), new object[] { sender, args }); return;
+                } catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); return; } }
+            this.main.USBspecifiedDeviceArrived(); }
+
+        public void USBspecifiedDeviceRemoved(object sender, global::System.EventArgs args) {
+            if (base.InvokeRequired) { 
+                try { base.Invoke(new global::System.EventHandler(this.USBspecifiedDeviceRemoved), new object[] { sender, args }); return;
+                } catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); return; } }
+            this.main.USBspecifiedDeviceRemoved(); }
+
+        public void USBdeviceArrived(object sender, global::System.EventArgs args) {
+            if (base.InvokeRequired) { 
+                try { base.Invoke(new global::System.EventHandler(this.USBdeviceArrived), new object[] { sender, args }); return;
+                } catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); return; } }
+            this.main.USBdeviceArrived(); }
+
+        public void USBdeviceRemoved(object sender, global::System.EventArgs args) {
+            if (base.InvokeRequired) {
+                try { base.Invoke(new global::System.EventHandler(this.USBdeviceRemoved), new object[] { sender, args }); return;
+                } catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); return; } }
+            this.main.USBdeviceRemoved(); }
+
+        public void DataRecieved(object sender, global::UsbLibrary.DataRecievedEventArgs args) {
+            if (base.InvokeRequired) {
+                try { base.Invoke(new global::UsbLibrary.DataRecievedEventHandler(this.DataRecieved), new object[] { sender, args }); return;
+                } catch (global::System.Exception ex) { global::System.Console.WriteLine(ex.ToString()); return; } }
+            this.main.DataRecieved(args.data);
+
+            /*if (args.data[0] == 4 && args.data[2] == 0 && args.data[3] == 0 && args.data[4] == 0 && args.data[5] == 0 && args.data[6] == 0) {
+                this.UC.JogOnSpeed(0, false, 0.0);
+                this.UC.JogOnSpeed(1, false, 0.0);
+                this.UC.JogOnSpeed(2, false, 0.0);
+                this.UC.JogOnSpeed(3, false, 0.0);
+                this.UC.JogOnSpeed(4, false, 0.0);
+                this.UC.JogOnSpeed(5, false, 0.0);
+                return; }
+
+            if (args.data[6] != 0) {
+                byte b = args.data[6];
+                if (b < 128) { this.__Y1JbMv8qwH += (int)b;
+                } else { this.__Y1JbMv8qwH -= 256 - (int)b; } }
+
+            if (args.data[5] != 6) {
+                switch (args.data[5]) {
+                    case 17: this.selectedAxis = 1; break;
+                    case 18: this.selectedAxis = 2; break;
+                    case 19: this.selectedAxis = 3; break;
+                    case 20: this.selectedAxis = 4; break;
+                    case 21: this.selectedAxis = 5; break;
+                    case 22: this.selectedAxis = 6; break; }
+            } else { this.selectedAxis = 0; }
+
+            int buttonNumber = 0;
+            if (args.data[4] == 13) { this.jogfeedrate = 2.0; buttonNumber = 241; }
+            if (args.data[4] == 14) { this.jogfeedrate = 5.0; buttonNumber = 164; }
+            if (args.data[4] == 15) { this.jogfeedrate = 10.0; buttonNumber = 165; }
+            if (args.data[4] == 16) { this.jogfeedrate = 30.0; buttonNumber = 166; }
+            if (args.data[4] == 26) { this.jogfeedrate = 60.0; }
+            if (args.data[4] == 27) { this.jogfeedrate = 100.0; }
+
+            this.keyTime = 3;
+            if (this.ContinuousMode) {
+                if ((double)this.UC.Getfieldint(false, 913) != this.jogfeedrate) {
+                    this.UC.Setfield(false, this.jogfeedrate, 913);
+                    this.UC.Validatefield(false, 913);
+                    this.UC.Setfield(true, this.jogfeedrate, 913);
+                    this.UC.Validatefield(true, 913); }
+            } else if (buttonNumber != 0 && buttonNumber != this.lastButtonIndex) {
+                this.UC.Callbutton(buttonNumber);
+                this.lastButtonIndex = buttonNumber; }
+
+            if (args.data[2] != 0 || args.data[3] != 0) {
+                byte b2 = args.data[2];
+                byte b3 = args.data[3];
+                this.buttonRegister02 = this.buttonRegister01;
+                if (b2 == 1) { this.buttonRegister01.Reset = true; } else { this.buttonRegister01.Reset = false; }
+                if (b2 == 2) { this.buttonRegister01.Stop = true; } else { this.buttonRegister01.Stop = false; }
+                if (b2 == 3) { this.buttonRegister01.StartPause = true; } else { this.buttonRegister01.StartPause = false; }
+
+                if (b2 == 12) {
+                    if (b3 == 10) { this.buttonRegister01.GotoZero = true; } else { this.buttonRegister01.GotoZero = false; }
+                    if (b3 == 13) { this.buttonRegister01.ProbeZ = true; } else { this.buttonRegister01.ProbeZ = false; }
+                    if (b3 == 11) { this.buttonRegister01.Spindle = true; } else { this.buttonRegister01.Spindle = false; }
+                    if (b3 == 9) { this.buttonRegister01.SafeZ = true; } else { this.buttonRegister01.SafeZ = false; }
+                    if (b3 == 8) { this.buttonRegister01.Home = true; } else { this.buttonRegister01.Home = false; }
+                    if (b3 == 4) { this.buttonRegister01.FeedPlus = true; } else { this.buttonRegister01.FeedPlus = false; }
+                    if (b3 == 5) { this.buttonRegister01.FeedMinus = true; } else { this.buttonRegister01.FeedMinus = false; }
+                    if (b3 == 6) { this.buttonRegister01.SpindlePlus = true; } else { this.buttonRegister01.SpindlePlus = false; }
+                    if (b3 == 7) { this.buttonRegister01.SpindleMinus = true; } else { this.buttonRegister01.SpindleMinus = false; } }
+                if (b2 == 4) { this.buttonRegister01.Macro1 = true; } else { this.buttonRegister01.Macro1 = false; }
+                if (b2 == 5) { this.buttonRegister01.Macro2 = true; } else { this.buttonRegister01.Macro2 = false; }
+                if (b2 == 6) { this.buttonRegister01.Macro3 = true; } else { this.buttonRegister01.Macro3 = false; }
+                if (b2 == 7) { this.buttonRegister01.Macro4 = true; } else { this.buttonRegister01.Macro4 = false; }
+                if (b2 == 8) { this.buttonRegister01.Macro5 = true; } else { this.buttonRegister01.Macro5 = false; }
+                if (b2 == 9) { this.buttonRegister01.Macro6 = true; } else { this.buttonRegister01.Macro6 = false; }
+                if (b2 == 10) { this.buttonRegister01.Macro7 = true; } else { this.buttonRegister01.Macro7 = false; }
+                if (b2 == 11) { this.buttonRegister01.Macro8 = true; } else { this.buttonRegister01.Macro8 = false; }
+                if (b2 == 13) { this.buttonRegister01.Macro9 = true; } else { this.buttonRegister01.Macro9 = false; }
+
+                if (b2 == 16) { this.buttonRegister01.Macro10 = true; } else { this.buttonRegister01.Macro10 = false; }
+                if (b2 == 15) { this.buttonRegister01.StepMode = true; } else { this.buttonRegister01.StepMode = false; }
+                if (b2 == 14) { this.buttonRegister01.ContinuousMode = true; } else { this.buttonRegister01.ContinuousMode = false; }
+            } else {
+                this.buttonRegister01.GotoZero = false;
+                this.buttonRegister01.Home = false;
+                this.buttonRegister01.Macro1 = false;
+                this.buttonRegister01.Macro2 = false;
+                this.buttonRegister01.Macro3 = false;
+                this.buttonRegister01.Macro4 = false;
+                this.buttonRegister01.Macro5 = false;
+                this.buttonRegister01.Macro6 = false;
+                this.buttonRegister01.Macro7 = false;
+                this.buttonRegister01.Macro8 = false;
+                this.buttonRegister01.Macro9 = false;
+                this.buttonRegister01.Macro10 = false;
+                this.buttonRegister01.ContinuousMode = false;
+                this.buttonRegister01.Null = false;
+                this.buttonRegister01.ProbeZ = false;
+                this.buttonRegister01.Reset = false;
+                this.buttonRegister01.SafeZ = false;
+                this.buttonRegister01.Spindle = false;
+                this.buttonRegister01.StartPause = false;
+                this.buttonRegister01.StepMode = false;
+                this.buttonRegister01.Stop = false;
+                this.buttonRegister01.FeedPlus = false;
+                this.buttonRegister01.FeedMinus = false;
+                this.buttonRegister01.SpindlePlus = false;
+                this.buttonRegister01.SpindleMinus = false; }
+            this.ActuatePendantCommands(); //*/
+        }
+        #endregion
     }
 }

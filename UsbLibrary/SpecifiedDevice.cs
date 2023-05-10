@@ -1,10 +1,12 @@
 using System;
-using System.Runtime.CompilerServices;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace UsbLibrary {
 	public class SpecifiedDevice : global::UsbLibrary.HIDDevice {
-		public SpecifiedDevice() : base() { }
+		//public SpecifiedDevice() : base() { }
 
 		private global::UsbLibrary.DataRecievedEventHandler dataRecievedEventHandler;
 		public event global::UsbLibrary.DataRecievedEventHandler DataRecieved {
@@ -54,8 +56,11 @@ namespace UsbLibrary {
 		protected override void Dispose(bool bDisposing) { 
 			base.Dispose(bDisposing); }
 
-		public static global::UsbLibrary.SpecifiedDevice FindSpecifiedDevice(int vendor_id, int product_id, bool write8Bit) {
-			return (global::UsbLibrary.SpecifiedDevice)global::UsbLibrary.HIDDevice.FindDevice(vendor_id, product_id, typeof(global::UsbLibrary.SpecifiedDevice), write8Bit); }
+		public static global::UsbLibrary.SpecifiedDevice FindSpecifiedDevice(string strSearch, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+			return (global::UsbLibrary.SpecifiedDevice)global::UsbLibrary.HIDDevice.FindDevice(strSearch, typeof(global::UsbLibrary.SpecifiedDevice), fileAccess, bufferLength); }
+
+		public static global::UsbLibrary.SpecifiedDevice FindSpecifiedDevice(int vendor_id, int product_id, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+			return (global::UsbLibrary.SpecifiedDevice)global::UsbLibrary.HIDDevice.FindDevice(vendor_id, product_id, typeof(global::UsbLibrary.SpecifiedDevice), fileAccess, bufferLength); }
 
 		protected override void HandleDataReceived(global::UsbLibrary.InputReport oInRep) {
 			if (this.dataRecievedEventHandler != null) {
