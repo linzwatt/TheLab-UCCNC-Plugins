@@ -55,8 +55,8 @@ namespace Pendant {
 		private UCCNCplugin main;
 		//private string readKeySubPath = "";
 		//private string writeKeyPath = "";
-		private const string readKeySubPath = "VID_10CE&PID_EB93\\5&2821e3bd&1&1";
-		private const string writeKeySubPath = "VID_10CE&PID_EB93\\5&2821e3bd&1&2";
+		private const string readKeySubPath = "VID_10CE&PID_EB93&Col01"; //"VID_10CE&PID_EB93\\5&2821e3bd&1&1";
+		private const string writeKeySubPath = "VID_10CE&PID_EB93&Col02"; //"VID_10CE&PID_EB93\\5&2821e3bd&1&2";
 		private global::System.Guid device_class;
 		public global::System.IntPtr usb_event_handle;
 		public UsbLibrary.SpecifiedDevice specifiedDeviceRead = null;
@@ -342,7 +342,7 @@ namespace Pendant {
 				bool history = (this.specifiedDeviceRead != null && this.specifiedDeviceWrite != null);
 
 				// Look for the device on the USB bus
-				this.specifiedDeviceRead = global::UsbLibrary.SpecifiedDevice.FindSpecifiedDevice(WHB4_04_Pendant.readKeySubPath, FileAccess.Read);
+				this.specifiedDeviceRead = global::UsbLibrary.SpecifiedDevice.FindSpecifiedDevice(WHB4_04_Pendant.readKeySubPath, FileAccess.Read, -1, throwMessage);
 
 				// Did we find it?
 				if (this.specifiedDeviceRead == null) {
@@ -362,7 +362,7 @@ namespace Pendant {
 				}
 
 				// Set the Write handler
-				this.specifiedDeviceWrite = global::UsbLibrary.SpecifiedDevice.FindSpecifiedDevice(WHB4_04_Pendant.writeKeySubPath, FileAccess.Write, 8);
+				this.specifiedDeviceWrite = global::UsbLibrary.SpecifiedDevice.FindSpecifiedDevice(WHB4_04_Pendant.writeKeySubPath, FileAccess.Write, 8, throwMessage);
 			} catch (Exception ex) { MessageBox.Show("UsbHiDPort.CheckDevicePresent Error.ToString(): '" + ex.ToString() + "'."); } }
 
 		/// <summary>

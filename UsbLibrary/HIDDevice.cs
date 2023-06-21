@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace UsbLibrary {
 	public abstract class HIDDevice : global::UsbLibrary.Win32Usb, global::System.IDisposable {
@@ -19,7 +20,7 @@ namespace UsbLibrary {
 		/// <summary>Handle to the device</summary>
 		public global::System.IntPtr m_hHandle;
 		#endregion
-
+		public IntPtr Reserved;
 		#region IDisposable Members
 		bool IsDisposing = false;
 
@@ -52,7 +53,7 @@ namespace UsbLibrary {
 			Win32Usb.HidP_GetCaps(lpData, out oCaps);
 			return oCaps; }
 
-		void Initialise(string strPath, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+		void Initialise(string strPath, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1, bool throwMessage = false) {
 			// Create the file from the device path
 			this.m_hHandle = Win32Usb.CreateFile(strPath, Win32Usb.GENERIC_READ | Win32Usb.GENERIC_WRITE, 0, IntPtr.Zero, Win32Usb.OPEN_EXISTING, Win32Usb.FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
@@ -70,20 +71,19 @@ namespace UsbLibrary {
 				this.m_nInputReportLength = oCaps.InputReportByteLength; // get the input...
 				this.m_nOutputReportLength = oCaps.OutputReportByteLength;   // ... and output report lengths
 
-				// Adjust the buffer length to the input report length if a default value was handed over
-				if (bufferLength == -1) { bufferLength = this.m_nInputReportLength; }
-
-				//m_oFile = new FileStream(m_hHandle, FileAccess.Read | FileAccess.Write, true, m_nInputReportLength, true);
-				this.m_oFile = new FileStream(new SafeFileHandle(this.m_hHandle, false), fileAccess, this.m_nInputReportLength, true);
+				// Use the buffer length value if it is not the default
+				if (bufferLength != -1) { this.m_oFile = new FileStream(new SafeFileHandle(this.m_hHandle, false), fileAccess, bufferLength, true); 
+				} else { this.m_oFile = new FileStream(new SafeFileHandle(this.m_hHandle, false), fileAccess, this.m_nInputReportLength, true); };
 
 				// kick off the first asynchronous read
 				if (fileAccess == FileAccess.Read || fileAccess == (FileAccess.Read | FileAccess.Write)) { 
 					this.BeginAsyncRead(); }                                
 			} catch (Exception ex) {
-				throw HIDDeviceException.GenerateWithWinError("Failed to get the detailed data from the hid. Error '" + ex.ToString() + "'.");
+				throw HIDDeviceException.GenerateWithWinError("Failed to get the detailed data from the hid. Error '" + ex.ToString() + "'.\n\nData \n" + ex.Data.ToString());
 			} finally {
 				Win32Usb.HidD_FreePreparsedData(ref lpData); // before we quit the funtion, we must free the internal buffer reserved in GetPreparsedData
 			}
+			
 		}
 
 		void BeginAsyncRead() {
@@ -143,8 +143,15 @@ namespace UsbLibrary {
 
 				// hardcoded to 5! Sorry, but this works and trying more future proof versions by setting the size to the struct sizeof failed miserably. If you manage to sort it, mail me! Thx
 				global::UsbLibrary.Win32Usb.DeviceInterfaceDetailData deviceInterfaceDetailData = new global::UsbLibrary.Win32Usb.DeviceInterfaceDetailData();
-				if (global::System.IntPtr.Size == 4) { deviceInterfaceDetailData.Size = 5;
-				} else { deviceInterfaceDetailData.Size = 8; }
+
+				if (Marshal.SizeOf(typeof(IntPtr)) == 8) {
+					deviceInterfaceDetailData.Size = 8; //For 64 bit.
+				} else {
+					deviceInterfaceDetailData.Size = 5; // hardcoded to 5! Sorry, but this works and trying more future proof versions by setting the size to the struct sizeof failed miserably. If you manage to sort it, mail me! Thx
+				}
+
+
+				//if (global::System.IntPtr.Size == 4) { deviceInterfaceDetailData.Size = 5; } else { deviceInterfaceDetailData.Size = 8; }
 
 				if (global::UsbLibrary.Win32Usb.SetupDiGetDeviceInterfaceDetail(lpDeviceInfoSet, ref oInterfaceData, ref deviceInterfaceDetailData, nDeviceInterfaceDetailDataSize, ref nDeviceInterfaceDetailDataSize, global::System.IntPtr.Zero)) {
 					return deviceInterfaceDetailData.DevicePath; } }
@@ -155,13 +162,13 @@ namespace UsbLibrary {
 
 		// Initialise(string strPath, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1)
 
-		public static HIDDevice NewHIDDevice(Type oType, string strDevicePath, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+		public static HIDDevice NewHIDDevice(Type oType, string strDevicePath, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1, bool throwMessage = false) {
 			// create an instance of the class for this device
 			HIDDevice oNewDevice = (HIDDevice)Activator.CreateInstance(oType);
 
 
 			// initialise it with the device path
-			oNewDevice.Initialise(strDevicePath, fileAccess, bufferLength);
+			oNewDevice.Initialise(strDevicePath, fileAccess, bufferLength, throwMessage);
 
 			// and return it
 			return oNewDevice; }
@@ -173,7 +180,10 @@ namespace UsbLibrary {
 		/// <param name="oType">Type of device class to create</param>
 		/// <param name="writer">Whether this is a writer or reader device</param>
 		/// <returns>A new device class of the given type or null</returns>
-		public static HIDDevice FindDevice(string strSearch, Type oType, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+		public static HIDDevice FindDevice(string strSearch, Type oType, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1, bool throwMessage = false) {
+			String devicePaths = "";
+			Boolean noErrors = true;
+
 			// next, get the GUID from Windows that it uses to represent the HID USB interface
 			Guid gHid = Win32Usb.HIDGuid;
 
@@ -190,15 +200,27 @@ namespace UsbLibrary {
 					string strDevicePath = HIDDevice.GetDevicePath(hInfoSet, ref oInterface);
 
 					// do a string search, if we find the VID/PID string then we found our device!
-					if (strDevicePath.IndexOf(strSearch) >= 0) { return HIDDevice.NewHIDDevice(oType, strDevicePath, fileAccess, bufferLength); }
+					if (strDevicePath.ToLower().IndexOf(strSearch.ToLower()) >= 0) {
+						try {
+							return HIDDevice.NewHIDDevice(oType, strDevicePath, fileAccess, bufferLength, throwMessage);
+						} catch (Exception initEx) {
+							noErrors = false;
+							if (throwMessage) {
+								MessageBox.Show("Failed to initialise device '" + strDevicePath + "' .\n\nMessage\n" + initEx.Message + "\n\nInner Exception\n" + initEx.InnerException + "\n\nSource\n" + initEx.Source + "\n\nStack Trace\n" + initEx.StackTrace); };
+						}; 
+					};
+					devicePaths = devicePaths + strDevicePath + "\n";
 				} // if we get here, we didn't find our device. So move on to the next one.
 			} catch (Exception ex) {
+				MessageBox.Show("Failed to initialise device.\n\n" + ex.Message + "\n\n" + ex.InnerException + "\n\n" + ex.Source + "\n\n" + ex.StackTrace);
 				throw HIDDeviceException.GenerateError(ex.ToString());
-				//Console.WriteLine(ex.ToString());
 			} finally {
 				// Before we go, we have to free up the InfoSet memory reserved by SetupDiGetClassDevs
 				Win32Usb.SetupDiDestroyDeviceInfoList(hInfoSet);
 			}
+
+			if (throwMessage && noErrors) { 
+				MessageBox.Show("No device found, but we found these.\n\n" + devicePaths); };
 
 			// oops, didn't find our device
 			return null;
@@ -211,13 +233,13 @@ namespace UsbLibrary {
 		/// <param name="nPid">Product id for device (PID)</param>
 		/// <param name="oType">Type of device class to create</param>
 		/// <returns>A new device class of the given type or null</returns>
-		public static HIDDevice FindDevice(int nVid, int nPid, Type oType, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1) {
+		public static HIDDevice FindDevice(int nVid, int nPid, Type oType, FileAccess fileAccess = FileAccess.Read | FileAccess.Write, int bufferLength = -1, bool throwMessage = false) {
 			// Find the path via the device manager, the HiD device that got added, the details tab, "Device instance path" variable
 			// Also look it up in the regedit, Computer\HKEY_LOCAL_MACHINE\SYSTEM\Current\CurrentControlSet\Enum\USB\
 			string strSearch = string.Format("VID_{0:x4}&PID_{1:x4}", nVid, nPid);
 
 			// Call the sub worker now you have the search string
-			return HIDDevice.FindDevice(strSearch, oType, fileAccess, bufferLength);
+			return HIDDevice.FindDevice(strSearch, oType, fileAccess, bufferLength, throwMessage);
 		}
 
 

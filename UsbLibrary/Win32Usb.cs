@@ -26,10 +26,10 @@ namespace UsbLibrary {
 		/// </summary>
 		[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
 		protected struct DeviceInterfaceData {
-			public int Size;
-			public global::System.Guid InterfaceClassGuid;
-			public int Flags;
-			public global::System.IntPtr Reserved;
+			public Int32 Size;
+			public Guid InterfaceClassGuid;
+			public Int32 Flags;
+			public IntPtr Reserved;
 		}
 
 		/// <summary>
